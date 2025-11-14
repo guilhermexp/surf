@@ -117,7 +117,7 @@
     padding: 0;
     // border-radius: 18px;
     // overflow: hidden;
-    // background: light-dark(#ffffff73, rgba(26, 36, 56, 0.45));
+    // background: light-dark(#ffffff73, rgba(16, 16, 16, 0.45));
     // backdrop-filter: blur(10px);
     // border: 0.5px solid light-dark(rgba(0, 0, 0, 0.1), rgba(71, 85, 105, 0.3));
     // box-shadow:
@@ -139,7 +139,7 @@
     }
 
     button {
-      background: light-dark(#fff, #1a2438);
+      background: light-dark(#fff, #101010);
       border: none;
       padding: 0.25rem 0.5rem;
       border-radius: 8px;

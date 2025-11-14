@@ -150,7 +150,7 @@
 
 <style>
   .toolbar-wrapper {
-    background: light-dark(#ffffff, #1b2435);
+    background: light-dark(#ffffff, #101010);
     border-bottom: 1px solid light-dark(rgba(0, 0, 0, 0.15), rgba(71, 85, 105, 0.4));
     color: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.9));
   }

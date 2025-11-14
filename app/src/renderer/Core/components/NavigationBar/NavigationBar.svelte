@@ -279,7 +279,7 @@
     background: light-dark(var(--app-background), var(--app-background-dark));
     color: light-dark(var(--on-app-background), var(--on-app-background-dark));
 
-    background: light-dark(#fff, #1a2438);
+    background: light-dark(#fff, #101010);
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
 
@@ -298,8 +298,8 @@
     border: 0.5px solid light-dark(#fff, rgba(71, 85, 105, 0.3));
     background: radial-gradient(
       290.88% 100% at 50% 0%,
-      light-dark(rgb(237 243 247 / 96%), rgba(27, 36, 56, 0.92)) 0%,
-      light-dark(rgba(255, 255, 255, 1), rgba(26, 36, 56, 1)) 100%
+      light-dark(rgb(237 243 247 / 96%), rgba(26, 26, 26, 0.92)) 0%,
+      light-dark(rgba(255, 255, 255, 1), rgba(16, 16, 16, 1)) 100%
     );
 
     box-shadow:
@@ -319,8 +319,8 @@
     &.grey {
       background: radial-gradient(
         290.88% 100% at 50% 0%,
-        light-dark(rgb(237 243 247 / 96%), rgba(27, 36, 56, 0.92)) 0%,
-        light-dark(rgba(250, 250, 250, 1), rgba(30, 40, 58, 1)) 100%
+        light-dark(rgb(237 243 247 / 96%), rgba(26, 26, 26, 0.92)) 0%,
+        light-dark(rgba(250, 250, 250, 1), rgba(16, 16, 16, 1)) 100%
       );
 
       box-shadow:

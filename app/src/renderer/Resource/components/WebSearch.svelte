@@ -308,7 +308,7 @@
   .websearch-container.expanded {
     border: 1px solid light-dark(rgba(0, 0, 0, 0.1), rgba(71, 85, 105, 0.4));
     border-radius: var(--t-3);
-    background: light-dark(var(--white), var(--surface-elevated-dark, #1b2435));
+    background: light-dark(var(--white), var(--surface-elevated-dark, #101010));
     box-shadow: 0 2px 8px light-dark(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.3));
   }
 

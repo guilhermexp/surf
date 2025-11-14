@@ -41,7 +41,7 @@
     padding: 0.5rem;
     border-radius: 8px;
     border: 1px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
-    background: light-dark(var(--color-background), var(--surface-elevated-dark, #1b2435));
+    background: light-dark(var(--color-background), var(--surface-elevated-dark, #101010));
     color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
     min-width: 20ch;
   }

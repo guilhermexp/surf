@@ -394,7 +394,7 @@
 <dialog
   id="printServiceDialog"
   class="min-w-[200px]"
-  style="background: light-dark(#ffffff, #1b2435); color: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.9));"
+  style="background: light-dark(#ffffff, #101010); color: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.9));"
 >
   <div class="row">
     <span data-l10n-id="print_progress_message">Preparing document for printing…</span>

@@ -491,7 +491,7 @@
     &.done {
       span {
         opacity: 0.75;
-        color: light-dark(var(--on-surface, #374151), var(--on-surface-dark, #cbd5f5));
+        color: light-dark(var(--on-surface, #374151), var(--on-surface-dark, #f8f8f2));
       }
       :global(svg.riso) {
         opacity: 0;

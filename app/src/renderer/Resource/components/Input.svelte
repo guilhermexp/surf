@@ -90,7 +90,7 @@
       radial-gradient(
         290.88% 100% at 50% 0%,
         var(--tab-active-gradient-top-dark, rgba(40, 53, 73, 0.92)) 0%,
-        var(--tab-active-gradient-bottom-dark, rgba(27, 36, 56, 0.88)) 100%
+        var(--tab-active-gradient-bottom-dark, rgba(26, 26, 26, 0.88)) 100%
       )
     );
     background: light-dark(
@@ -150,7 +150,7 @@
           radial-gradient(
             290.88% 100% at 50% 0%,
             var(--tab-active-gradient-top-dark, rgba(40, 53, 73, 0.92)) 0%,
-            var(--tab-active-gradient-bottom-dark, rgba(27, 36, 56, 0.88)) 100%
+            var(--tab-active-gradient-bottom-dark, rgba(26, 26, 26, 0.88)) 100%
           )
         );
         background: light-dark(
@@ -202,7 +202,7 @@
           radial-gradient(
             290.88% 100% at 50% 0%,
             var(--tab-active-gradient-top-dark, rgba(40, 53, 73, 0.92)) 0%,
-            var(--tab-active-gradient-bottom-dark, rgba(27, 36, 56, 0.88)) 100%
+            var(--tab-active-gradient-bottom-dark, rgba(26, 26, 26, 0.88)) 100%
           )
         );
         background: light-dark(

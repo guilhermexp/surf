@@ -193,7 +193,7 @@
     width: 100%;
     max-width: 70ch;
 
-    background: light-dark(#fff, #1a2438);
+    background: light-dark(#fff, #101010);
     border: 1px solid light-dark(rgba(0, 0, 0, 0.175), rgba(71, 85, 105, 0.4));
     box-shadow: light-dark(0 2px 10px rgba(0, 0, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.3));
     border-radius: 20px;

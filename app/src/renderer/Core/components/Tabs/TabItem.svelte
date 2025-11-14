@@ -209,7 +209,7 @@
       background: radial-gradient(
         290.88% 100% at 50% 0%,
         light-dark(rgba(237, 246, 255, 0.96), rgba(40, 53, 73, 0.92)) 0%,
-        light-dark(rgba(246, 251, 255, 0.93), rgba(27, 36, 56, 0.88)) 100%
+        light-dark(rgba(246, 251, 255, 0.93), rgba(26, 26, 26, 0.88)) 100%
       );
       background: radial-gradient(
         290.88% 100% at 50% 0%,

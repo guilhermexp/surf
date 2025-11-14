@@ -218,7 +218,7 @@
 
     -electron-corner-smoothing: 60%;
     //font-size: 11px;
-    --text: light-dark(#586884, #c7d2ff);
+    --text: light-dark(#586884, #f8f8f2);
     --text-p3: color(display-p3 0.3571 0.406 0.5088);
     --text-light: #666666;
     --background-dark: radial-gradient(
@@ -236,19 +236,19 @@
     --background-accent: #eff2ff;
     --background-accent-hover: rgb(246, 247, 253);
     --background-accent-p3: color(display-p3 0.9381 0.9473 1);
-    --background-accent-dark: #1e2433;
-    --background-accent-p3-dark: color(display-p3 0.118 0.141 0.2);
+    --background-accent-dark: #1a1a1a;
+    --background-accent-p3-dark: color(display-p3 0.1 0.1 0.1);
     --border-color: #e0e0e088;
     --outline-color: #e0e0e080;
-    --primary: #2a62f1;
-    --primary-dark: #a48e8e;
-    --green: #0ec463;
-    --red: #f24441;
-    --orange: #fa870c;
+    --primary: #66d9ff;
+    --primary-dark: #66d9ff;
+    --green: #a6ff2e;
+    --red: #f92672;
+    --orange: #ff971f;
     --border-width: 0.5px;
-    --color-brand: #b7065c;
-    --color-brand-muted: #b7065cba;
-    --color-brand-dark: #ff4fa4;
+    --color-brand: #f92672;
+    --color-brand-muted: #f92672ba;
+    --color-brand-dark: #f92672;
     --border-radius: 18px;
   }
 
@@ -273,21 +273,19 @@
   }
 
   :global(body) {
-    background:
-      light-dark(
+    background: light-dark(
         linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 1)),
-        linear-gradient(rgba(13, 20, 33, 0.85), rgba(13, 20, 33, 0.95))
+        linear-gradient(rgba(16, 16, 16, 0.95), rgba(16, 16, 16, 1))
       ),
       url('./assets/greenfield.png');
-    background: light-dark(rgba(250, 250, 250, 1), #0d1421);
-    background:
-      light-dark(
+    background: light-dark(rgba(250, 250, 250, 1), #101010);
+    background: light-dark(
         linear-gradient(to bottom, rgba(250, 250, 250, 1) 0%, rgba(255, 255, 255, 0.9) 10%),
-        linear-gradient(to bottom, rgba(13, 20, 33, 0.95) 0%, rgba(13, 20, 33, 0.98) 12%)
+        linear-gradient(to bottom, rgba(16, 16, 16, 0.98) 0%, rgba(5, 5, 5, 1) 12%)
       ),
       light-dark(
         radial-gradient(at bottom right, transparent, rgba(255, 255, 255, 0.8) 90%),
-        radial-gradient(at bottom right, transparent, rgba(12, 23, 41, 0.6) 90%)
+        radial-gradient(at bottom right, transparent, rgba(7, 7, 7, 0.6) 90%)
       ),
       url('./assets/greenfield.png');
     background-repeat: no-repeat;
@@ -374,7 +372,7 @@
   }
 
   :global(.dragcula-drop-indicator) {
-    --color: #3765ee;
+    --color: #66d9ff;
     --dotColor: white;
     --inset: 3%;
     background: var(--color);

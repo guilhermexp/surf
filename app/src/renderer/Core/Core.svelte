@@ -339,15 +339,15 @@
     bottom: 0;
     background: radial-gradient(
       300% 7% at 50.04% 0%,
-      light-dark(#deedfe, #1a2438) 0%,
-      light-dark(#b3d4fe, #0f141f) 69.23%,
-      light-dark(#c9dcfd, #0f141f) 93.37%
+      light-dark(#deedfe, #1a1a1a) 0%,
+      light-dark(#b3d4fe, #101010) 69.23%,
+      light-dark(#c9dcfd, #101010) 93.37%
     );
     background: radial-gradient(
       300% 7% at 50.04% 0%,
-      light-dark(color(display-p3 0.8807 0.9291 0.9921), color(display-p3 0.102 0.1412 0.2196)) 0%,
-      light-dark(color(display-p3 0.7031 0.8325 0.9963), color(display-p3 0.06 0.08 0.12)) 69.23%,
-      light-dark(color(display-p3 0.7938 0.8654 0.9912), color(display-p3 0.06 0.08 0.12)) 93.37%
+      light-dark(color(display-p3 0.8807 0.9291 0.9921), color(display-p3 0.1 0.1 0.1)) 0%,
+      light-dark(color(display-p3 0.7031 0.8325 0.9963), color(display-p3 0.063 0.063 0.063)) 69.23%,
+      light-dark(color(display-p3 0.7938 0.8654 0.9912), color(display-p3 0.063 0.063 0.063)) 93.37%
     );
     display: flex;
     flex-direction: column;
@@ -356,15 +356,17 @@
       flex-direction: column;
       background: radial-gradient(
         50% 300% at 0% 50%,
-        light-dark(#deedfe, #1a2438) 0%,
-        light-dark(#b3d4fe, #0f141f) 69.23%,
-        light-dark(#c9dcfd, #0f141f) 93.37%
+        light-dark(#deedfe, #1a1a1a) 0%,
+        light-dark(#b3d4fe, #101010) 69.23%,
+        light-dark(#c9dcfd, #101010) 93.37%
       );
       background: radial-gradient(
         50% 300% at 0% 50%,
-        light-dark(color(display-p3 0.8807 0.9291 0.9921), color(display-p3 0.102 0.1412 0.2196)) 0%,
-        light-dark(color(display-p3 0.7031 0.8325 0.9963), color(display-p3 0.06 0.08 0.12)) 69.23%,
-        light-dark(color(display-p3 0.7938 0.8654 0.9912), color(display-p3 0.06 0.08 0.12)) 93.37%
+        light-dark(color(display-p3 0.8807 0.9291 0.9921), color(display-p3 0.1 0.1 0.1)) 0%,
+        light-dark(color(display-p3 0.7031 0.8325 0.9963), color(display-p3 0.063 0.063 0.063))
+          69.23%,
+        light-dark(color(display-p3 0.7938 0.8654 0.9912), color(display-p3 0.063 0.063 0.063))
+          93.37%
       );
     }
   }
@@ -458,16 +460,16 @@
     --background-accent-p3: color(display-p3 1 1 1);
     --border-color: #e0e0e088;
     --outline-color: #e0e0e080;
-    --primary: #2a62f1;
-    --primary-dark: #a48e8e;
-    --green: #0ec463;
-    --red: #f24441;
-    --orange: #fa870c;
+    --primary: #66d9ff;
+    --primary-dark: #66d9ff;
+    --green: #a6ff2e;
+    --red: #f92672;
+    --orange: #ff971f;
     --border-width: 0.5px;
     --border-color: #58688460;
-    --color-brand: #b7065c;
-    --color-brand-muted: #b7065cba;
-    --color-brand-dark: #ff4fa4;
+    --color-brand: #f92672;
+    --color-brand-muted: #f92672ba;
+    --color-brand-dark: #f92672;
 
     --border-radius: 18px;
   }
@@ -536,7 +538,7 @@
   }
 
   :global(.dragcula-drop-indicator) {
-    --color: #3765ee;
+    --color: #66d9ff;
     --dotColor: white;
     --inset: 3%;
     background: var(--color);

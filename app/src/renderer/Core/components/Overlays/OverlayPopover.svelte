@@ -75,7 +75,7 @@
 <style lang="scss">
   .popover-content-wrapper {
     display: flex;
-    //background: light-dark(white, #1a2438);
+    //background: light-dark(white, #101010);
     //border: 1px solid light-dark(#eee, rgba(71, 85, 105, 0.3));
     border-radius: 12px;
     overflow: hidden;

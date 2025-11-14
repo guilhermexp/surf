@@ -62,7 +62,7 @@
 
     color: light-dark(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.5));
     //background: light-dark(rgba(0, 0, 0, 0.035), rgba(255, 255, 255, 0.035));
-    background: light-dark(rgba(250, 250, 250, 0.85), rgba(26, 36, 56, 0.85));
+    background: light-dark(rgba(250, 250, 250, 0.85), rgba(16, 16, 16, 0.85));
     backdrop-filter: blur(8px);
     border: 0.5px solid light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));
 

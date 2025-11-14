@@ -902,7 +902,7 @@
   }
 
   :global(code-block .bg-white) {
-    background-color: light-dark(#ffffff, #1e2433) !important;
+    background-color: light-dark(#ffffff, #1a1a1a) !important;
   }
 
   // Override inline text color

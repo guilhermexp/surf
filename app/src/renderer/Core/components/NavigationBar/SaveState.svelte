@@ -215,15 +215,15 @@
     );
     --ctx-item-hover: light-dark(
       var(--accent-background, #f3f5ff),
-      var(--accent-background-dark, #1e2639)
+      var(--accent-background-dark, #1a1a1a)
     );
     --ctx-item-text: light-dark(
       var(--on-surface-accent, #330988),
-      var(--on-surface-accent-dark, #a5b4ff)
+      var(--on-surface-accent-dark, #66d9ff)
     );
     --ctx-item-text-hover: light-dark(
       var(--on-surface-accent, #330988),
-      var(--on-surface-accent-dark, #c7d2ff)
+      var(--on-surface-accent-dark, #f8f8f2)
     );
 
     padding: 0;
@@ -235,7 +235,7 @@
     border-radius: 12px;
     border: 0.5px solid var(--ctx-border);
     box-shadow: 0 2px 10px var(--ctx-shadow-color);
-    background: light-dark(var(--surface-elevated, #fff), var(--surface-elevated-dark, #1b2435));
+    background: light-dark(var(--surface-elevated, #fff), var(--surface-elevated-dark, #101010));
     color: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.9));
     font-size: 0.95rem;
     display: flex;

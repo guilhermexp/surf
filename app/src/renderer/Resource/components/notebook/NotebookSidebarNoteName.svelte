@@ -294,7 +294,7 @@
   }
 
   :global(.note-bg) {
-    fill: light-dark(#f9f9f9, #1e2433);
+    fill: light-dark(#f9f9f9, #1a1a1a);
   }
 
   :global(.note-border) {

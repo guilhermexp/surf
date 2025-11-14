@@ -684,7 +684,7 @@
     --tree-hover-bg: light-dark(rgba(88, 104, 132, 0.08), rgba(148, 163, 184, 0.1));
     --tree-selected-bg: light-dark(rgba(88, 104, 132, 0.12), rgba(148, 163, 184, 0.15));
     --tree-selected-border: light-dark(rgba(88, 104, 132, 0.2), rgba(148, 163, 184, 0.3));
-    --tree-drop-indicator-color: light-dark(#3765ee, #8192ff);
+    --tree-drop-indicator-color: light-dark(#66d9ff, #8192ff);
     --tree-drag-over-bg: light-dark(rgba(59, 130, 246, 0.1), rgba(129, 146, 255, 0.15));
     background: transparent;
     overflow-y: auto;

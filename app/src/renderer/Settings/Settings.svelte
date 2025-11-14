@@ -643,7 +643,7 @@
     display: flex;
     justify-content: center;
     padding: 3rem;
-    background-color: light-dark(#e3f0ff, var(--surface-elevated-dark, #1b2435));
+    background-color: light-dark(#e3f0ff, var(--surface-elevated-dark, #101010));
 
     box-shadow:
       -0.5px 0 1px 0 light-dark(rgb(250, 250, 250), rgba(15, 23, 42, 0.8)) inset,
@@ -723,7 +723,7 @@
     justify-content: space-between;
     background-color: light-dark(
       var(--color-background-light),
-      var(--surface-elevated-dark, #1b2435)
+      var(--surface-elevated-dark, #101010)
     );
     border-bottom: 1px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
     border-radius: 1.25rem;
@@ -894,7 +894,7 @@
     padding: 1rem;
     border: 1px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
     border-radius: 8px;
-    background: light-dark(var(--color-background-light), var(--surface-elevated-dark, #1b2435));
+    background: light-dark(var(--color-background-light), var(--surface-elevated-dark, #101010));
     color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
     outline: none;
     font-size: 1rem;
