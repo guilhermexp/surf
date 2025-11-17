@@ -59,7 +59,7 @@
   {:else if type === 'password'}
     <input type="password" {placeholder} bind:value class="input" on:input={handleInput} on:blur />
   {:else if type === 'checkbox' && typeof value === 'boolean'}
-    <Switch color="#ff4eed" fontSize={14} bind:checked={value} on:update={handleChange} />
+    <Switch color="#ffffff" fontSize={14} bind:checked={value} on:update={handleChange} />
   {/if}
 </div>
 

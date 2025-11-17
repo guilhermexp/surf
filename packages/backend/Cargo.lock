@@ -1390,6 +1390,7 @@ dependencies = [
  "semver",
  "send_wrapper",
  "smallvec",
+ "tokio",
 ]
 
 [[package]]

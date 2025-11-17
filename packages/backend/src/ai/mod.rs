@@ -1,3 +1,4 @@
+pub mod claude_agent;
 pub mod embeddings;
 pub mod llm;
 pub mod youtube;
@@ -13,6 +14,7 @@ pub const _AI_API_ENDPOINT: &str = "v1/deta-os-ai";
 
 use std::str::FromStr;
 
+use crate::ai::claude_agent::ClaudeAgentRuntime;
 use crate::ai::embeddings::chunking::ContentChunker;
 use crate::ai::llm::client;
 use crate::ai::llm::client::{ChatCompletionStream, Model};
@@ -96,9 +98,14 @@ fn human_readable_current_time() -> String {
 }
 
 impl AI {
-    pub fn new(local_ai_socket_path: String) -> BackendResult<Self> {
+    pub fn new(
+        local_ai_socket_path: String,
+        claude_agent_runtime: Option<ClaudeAgentRuntime>,
+    ) -> BackendResult<Self> {
+        let mut client = client::LLMClient::new()?;
+        client.set_claude_agent_runtime(claude_agent_runtime);
         Ok(Self {
-            client: client::LLMClient::new()?,
+            client,
             chunker: ContentChunker::new(2000, 1),
             local_ai_client: LocalAIClient::new(local_ai_socket_path),
         })

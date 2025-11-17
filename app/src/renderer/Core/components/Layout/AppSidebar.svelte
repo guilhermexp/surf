@@ -219,13 +219,18 @@
   }
   .resize-handle {
     flex-shrink: 0;
-    position: relative;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: var(--fold-width);
+    transform: translateX(-100%);
     cursor: ew-resize;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    z-index: 10;
 
     &::before {
       content: '';

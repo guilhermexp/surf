@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "beforeToolUse": null,
+    "afterToolUse": null
+  },
+  "models": {
+    "default": "claude-sonnet-4-5-20250929",
+    "chat": "claude-sonnet-4-5-20250929",
+    "reasoning": "claude-sonnet-4-5-20250929"
+  },
+  "mcpServers": {},
+  "permissions": {
+    "mode": "manual",
+    "autoApproveEdits": false
+  },
+  "agent": {
+    "cwd": null,
+    "includePartialMessages": false,
+    "allowedTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+  },
+  "environment": {
+    "ANTHROPIC_API_KEY": null
+  }
+}

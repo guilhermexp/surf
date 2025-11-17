@@ -3,6 +3,7 @@ use super::{
     PathConfig, WorkerConfig,
 };
 use crate::{
+    ai::claude_agent::ClaudeAgentRunnerHandle,
     api::message::{
         AIMessage, ProcessorMessage, ResourceMessage, TunnelMessage, TunnelOneshot, WorkerMessage,
     },
@@ -27,6 +28,7 @@ pub struct WorkerTunnel {
     pub aiqueue_rx: crossbeam::Receiver<AIMessage>,
     pub event_bus_rx_callback: Arc<Root<JsFunction>>,
     pub surf_backend_health: SurfBackendHealth,
+    pub claude_agent_runner: ClaudeAgentRunnerHandle,
 }
 
 pub struct SurfBackendHealth(Arc<(Mutex<bool>, Condvar)>);
@@ -94,12 +96,14 @@ impl WorkerTunnel {
         let (aiqueue_tx, aiqueue_rx) = crossbeam::unbounded();
         let surf_backend_health = SurfBackendHealth::new(Some(false));
         let event_bus_rx_callback = Arc::new(event_bus_rx_callback);
+        let claude_agent_runner = Arc::new(Mutex::new(None));
         let tunnel = Self {
             worker_tx,
             tqueue_rx,
             aiqueue_rx,
             event_bus_rx_callback: event_bus_rx_callback.clone(),
             surf_backend_health: surf_backend_health.clone(),
+            claude_agent_runner: claude_agent_runner.clone(),
         };
 
         Self::spawn_threads(cx, config, worker_rx, tqueue_tx, aiqueue_tx, &tunnel);
@@ -126,6 +130,7 @@ impl WorkerTunnel {
             aiqueue_tx,
             Arc::clone(&tunnel.event_bus_rx_callback),
             tunnel.surf_backend_health.clone(),
+            tunnel.claude_agent_runner.clone(),
         );
         Self::spawn_processor_threads(tunnel, &config);
     }
@@ -138,6 +143,7 @@ impl WorkerTunnel {
         aiqueue_tx: crossbeam::Sender<AIMessage>,
         event_bus_rx_callback: Arc<Root<JsFunction>>,
         surf_backend_health: SurfBackendHealth,
+        claude_agent_runner: ClaudeAgentRunnerHandle,
     ) where
         C: Context<'a>,
     {
@@ -161,6 +167,7 @@ impl WorkerTunnel {
             let backend_root_path = config.backend_root_path.clone();
             let local_ai_mode = config.local_ai_mode;
             let language_setting = config.language_setting.clone();
+            let runner_handle = claude_agent_runner.clone();
 
             std::thread::Builder::new()
             .name(thread_name.clone())
@@ -189,6 +196,7 @@ impl WorkerTunnel {
                         language_setting: language_setting.clone(),
                         run_migrations: _run_migrations,
                         surf_backend_health: surf_backend_health.clone(),
+                        claude_agent_runner: runner_handle.clone(),
                     };
 
                     worker_thread_entry_point(worker_rx.clone(), worker_config)
@@ -244,6 +252,27 @@ impl WorkerTunnel {
         rx.recv()
             .map_err(|e| tracing::error!("failed to initiate worker jobs: {e}"))
             .ok();
+    }
+
+    pub fn register_claude_agent_runner(&self, runner: Root<JsFunction>) {
+        tracing::info!("[WorkerTunnel] register_claude_agent_runner called");
+        tracing::info!(
+            "[WorkerTunnel] Arc pointer being written to: {:p}",
+            Arc::as_ptr(&self.claude_agent_runner)
+        );
+        if let Ok(mut guard) = self.claude_agent_runner.lock() {
+            tracing::info!("[WorkerTunnel] Got mutex lock, setting runner");
+            *guard = Some(runner);
+            tracing::info!("[WorkerTunnel] ✅ Runner registered successfully in mutex");
+            tracing::info!(
+                "[WorkerTunnel] Arc pointer after registration: {:p}",
+                Arc::as_ptr(&self.claude_agent_runner)
+            );
+        } else {
+            tracing::error!(
+                "[WorkerTunnel] ❌ Failed to acquire mutex lock for runner registration"
+            );
+        }
     }
 
     pub fn worker_send_js(&self, message: WorkerMessage, deferred: Deferred) {

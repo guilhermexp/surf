@@ -126,10 +126,10 @@
       }
 
       & .primary {
-        background-color: rgb(242 109 170);
+        background-color: rgb(136 136 136);
         color: rgb(247 245 242);
-        outline-color: #f7b6d0;
-        border: solid 4px rgb(247 182 208 / 0.7);
+        outline-color: #bcb6b1;
+        border: solid 4px rgb(188 182 177 / 0.7);
       }
 
       & .secondary {

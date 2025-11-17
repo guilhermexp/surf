@@ -90,14 +90,14 @@
       border: none;
       outline: none;
       border-radius: 8px;
-      background: light-dark(#f73b95, #d63384);
+      background: light-dark(#888888, #707070);
       color: #fff;
 
       transition: color 0.2s;
       width: fit-content;
 
       &:hover {
-        background: light-dark(#f92d90, #e04a94);
+        background: light-dark(#707070, #888888);
       }
 
       &:active {

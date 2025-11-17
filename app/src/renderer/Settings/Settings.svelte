@@ -21,6 +21,8 @@
   import { openDialog, prepareContextMenu } from '@deta/ui'
   import SmartNotesOptions from './components/SmartNotesOptions.svelte'
   import LayoutPicker from '../components/LayoutPicker.svelte'
+  import LanguageSelector from './components/LanguageSelector.svelte'
+  import { translator as t } from '../Core/i18n'
 
   // let error = ''
   // let loading = false
@@ -60,7 +62,7 @@
     try {
       // @ts-ignore
       await window.backend.sffs.js__backend_run_migration()
-      migrationOutput.innerText = 'Migration complete!'
+      migrationOutput.innerText = $t('settings.general.dev.completed')
     } catch (error) {
       console.error(error)
       migrationOutput.innerText = error
@@ -152,12 +154,11 @@
     window.api.deanonymizeUser()
 
     const { closeType: confirmed } = await openDialog({
-      title: 'Share your email with us',
-      message:
-        'Accepting will share your email with us, and allow us to contact you based on your Surf usage. No spam, we promise.<br><br> (Surf will restart after accepting)',
+      title: $t('settings.general.help.title'),
+      message: $t('settings.general.help.message'),
       actions: [
-        { title: 'Cancel', type: 'reset' },
-        { title: 'Accept', type: 'submit' }
+        { title: $t('common.actions.cancel'), type: 'reset' },
+        { title: $t('settings.general.help.accept'), type: 'submit' }
       ]
     })
     if (confirmed) {
@@ -241,7 +242,7 @@
       class:active={$activeTab === 'general'}
     >
       <Icon name="settings" size="24" />
-      <h1>General</h1>
+      <h1>{$t('settings.tabs.general')}</h1>
     </div>
 
     <div
@@ -252,7 +253,7 @@
       class:active={$activeTab === 'ai'}
     >
       <Icon name="sparkles" size="24" />
-      <h1>AI</h1>
+      <h1>{$t('settings.tabs.ai')}</h1>
     </div>
 
     <!-- <div
@@ -292,8 +293,10 @@
 
         {#if isDev}
           <div class="dev-wrapper">
-            <h3>Migration</h3>
-            <button on:click={handleMigration} disabled={migrating}>Run Migration</button>
+            <h3>{$t('settings.general.dev.migration')}</h3>
+            <button on:click={handleMigration} disabled={migrating}>
+              {$t('settings.general.dev.runMigration')}
+            </button>
             {#if migrating}
               <Icon name="spinner" size="22px" />
             {/if}
@@ -306,12 +309,14 @@
           <div class="dark-mode-wrapper">
             <SettingsOption
               icon="moon"
-              title="Dark Mode"
-              description="Enable dark appearance for the application."
+              title={$t('settings.general.darkMode.title')}
+              description={$t('settings.general.darkMode.description')}
               bind:value={isDarkMode}
               on:update={handleDarkModeToggle}
             />
           </div>
+
+          <LanguageSelector bind:settings={userConfigSettings} />
 
           <div class="search-wrapper">
             <DefaultSearchEnginePicker
@@ -335,7 +340,7 @@
               <div class="license-icon" class:open={showLicenses}>
                 <Icon name="chevron.down" />
               </div>
-              Open Source Licenses And Notices
+              {$t('settings.general.licenses.title')}
             </div>
 
             {#if showLicenses}
@@ -352,7 +357,7 @@
             <div class="license-icon" class:open={showMiscInfo}>
               <Icon name="chevron.down" />
             </div>
-            Miscellaneous
+            {$t('settings.general.misc.title')}
           </div>
         </div>
       </article>
@@ -477,19 +482,38 @@
   }
   :global(:root) {
     /* Import design tokens */
-    --color-text: var(--on-app-background, #0c0729);
-    --color-text-muted: var(--on-surface, #5b6882);
+    --color-text: var(--on-app-background, #1c1014);
+    --color-text-muted: var(--on-surface, #4b4038);
     --color-text-light: var(--white, #ffffff);
-    --color-brand: var(--accent, #6d82ff);
-    --color-brand-dark: var(--on-surface-accent, #330988);
-    --color-brand-light: var(--accent-background, #f3f5ff);
-    --color-link: var(--accent, #6d82ff);
-    --color-link-dark: var(--on-surface-accent, #330988);
-    --color-background: var(--app-background, #c8e3ff);
-    --color-background-dark: var(--accent-muted, rgba(91, 104, 130, 0.45));
-    --color-background-light: var(--app-background-light, #fefeff);
-    --color-border-dark: var(--on-surface-muted, #3c465a);
-    --color-border: var(--white-40, rgba(255, 255, 255, 0.4));
+    --color-brand: var(--accent, #ffffff);
+    --color-brand-dark: var(--accent-dark, #e0e0e0);
+    --color-brand-light: var(--accent-background, #ffe6f0);
+    --color-link: var(--brand-link, #ff971f);
+    --color-link-dark: var(--brand-secondary, #ae81ff);
+    --color-background: var(--app-background, #f9f1eb);
+    --color-background-dark: var(--app-background-dark, #101010);
+    --color-background-light: var(--app-background-light, #fff7f2);
+    --color-border-dark: var(--on-surface-muted, #6a5c54);
+    --color-border: rgba(255, 255, 255, 0.12);
+    --settings-dark-sidebar: radial-gradient(
+      220% 160% at 10% -20%,
+      rgba(16, 16, 16, 0.95) 0%,
+      rgba(10, 10, 10, 0.98) 60%,
+      rgba(5, 5, 5, 1) 100%
+    );
+    --settings-dark-card: linear-gradient(
+      135deg,
+      rgba(26, 26, 26, 0.85) 0%,
+      rgba(16, 16, 16, 0.95) 100%
+    );
+    --settings-dark-border: rgba(143, 143, 143, 0.25);
+    --settings-dark-border-strong: rgba(143, 143, 143, 0.35);
+    --settings-dark-hover: rgba(255, 255, 255, 0.06);
+    --settings-dark-hover-border: rgba(255, 255, 255, 0.2);
+    --settings-dark-shadow: 0 30px 60px rgba(0, 0, 0, 0.65);
+    --settings-dark-card-shadow: 0 22px 45px rgba(0, 0, 0, 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --settings-dark-divider: rgba(143, 143, 143, 0.2);
   }
 
   :global(*) {
@@ -504,8 +528,8 @@
   main {
     height: 100vh;
     width: calc(100vw - (100vw - 100%));
-    color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
-    background-color: light-dark(var(--color-background), var(--app-background-dark, #0f172a));
+    color: light-dark(var(--color-text), var(--on-surface-dark, #f8f8f2));
+    background-color: light-dark(var(--color-background), var(--app-background-dark, #101010));
     display: flex;
     flex-direction: row;
     overflow: hidden;
@@ -542,24 +566,19 @@
     align-items: stretch;
     padding: var(--t-4, 1rem);
     padding-top: var(--t-10, 4rem); /* Space for macOS traffic lights */
-    border-right: 0.5px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
+    border-right: 0.5px solid light-dark(var(--color-border), var(--settings-dark-border));
     width: 200px;
     z-index: 10;
 
     background: radial-gradient(
-      453.65% 343.29% at 50.04% 0%,
-      color(display-p3 0.8807 0.9291 0.9921) 0%,
-      color(display-p3 0.7031 0.8325 0.9963) 69.23%,
-      color(display-p3 0.7938 0.8654 0.9912) 93.37%
+      360% 220% at 50% 0%,
+      rgba(255, 238, 244, 0.96) 0%,
+      rgba(255, 247, 243, 0.96) 60%,
+      rgba(255, 253, 248, 0.95) 100%
     );
 
     @media (prefers-color-scheme: dark) {
-      background: radial-gradient(
-        453.65% 343.29% at 50.04% 0%,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(15, 23, 42, 0.98) 69.23%,
-        rgba(15, 23, 42, 1) 93.37%
-      );
+      background: var(--settings-dark-sidebar);
     }
   }
 
@@ -569,7 +588,7 @@
     align-items: center;
     padding: var(--t-2, 0.5rem) var(--t-3, 0.75rem);
     border-radius: var(--t-11, 11px);
-    color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #94a3b8));
+    color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #9da4c4));
     width: 100%;
     justify-content: flex-start;
     border: 0.5px solid transparent;
@@ -582,40 +601,34 @@
       box-shadow 90ms ease-out;
 
     &:hover {
-      background: light-dark(rgba(255, 255, 255, 0.6), rgba(30, 41, 59, 0.5));
+      background: light-dark(rgba(255, 255, 255, 0.6), var(--settings-dark-hover));
       box-shadow:
-        inset 0 0 0 0.75px light-dark(rgba(255, 255, 255, 0.1), rgba(100, 116, 139, 0.1)),
-        inset 0 0.5px 0 1px light-dark(rgba(255, 255, 255, 0.2), rgba(148, 163, 184, 0.1)),
-        inset 0 -0.75px 0 1px light-dark(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.3));
+        inset 0 0 0 0.75px light-dark(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+        inset 0 0.5px 0 1px light-dark(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08)),
+        inset 0 -0.75px 0 1px light-dark(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.4));
     }
 
     &.active {
-      border: 0.5px solid light-dark(var(--white, #fff), rgba(71, 85, 105, 0.6));
+      border: 0.5px solid light-dark(var(--white, #fff), var(--settings-dark-hover-border));
       background: radial-gradient(
         290.88% 100% at 50% 0%,
         rgba(237, 246, 255, 0.96) 0%,
         rgba(246, 251, 255, 0.93) 100%
       );
       box-shadow:
-        0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+        0 -0.5px 1px 0 rgba(255, 255, 255, 0.1) inset,
         0 1px 1px 0 #fff inset,
         0 3px 3px 0 rgba(62, 71, 80, 0.02),
         0 1px 2px 0 rgba(62, 71, 80, 0.02),
         0 0 1px 0 rgba(0, 0, 0, 0.09);
-      color: light-dark(var(--color-brand-dark), var(--accent-dark, #8192ff));
+      color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
 
       @media (prefers-color-scheme: dark) {
-        background: radial-gradient(
-          290.88% 100% at 50% 0%,
-          rgba(30, 41, 59, 0.96) 0%,
-          rgba(15, 23, 42, 0.93) 100%
-        );
+        background: var(--settings-dark-card);
         box-shadow:
-          0 -0.5px 1px 0 rgba(129, 146, 255, 0.15) inset,
-          0 1px 1px 0 rgba(71, 85, 105, 0.3) inset,
-          0 3px 3px 0 rgba(0, 0, 0, 0.3),
-          0 1px 2px 0 rgba(0, 0, 0, 0.2),
-          0 0 1px 0 rgba(0, 0, 0, 0.5);
+          0 -0.5px 1px 0 var(--settings-dark-border) inset,
+          0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+          0 14px 24px rgba(0, 0, 0, 0.65);
       }
     }
 
@@ -643,14 +656,14 @@
     display: flex;
     justify-content: center;
     padding: 3rem;
-    background-color: light-dark(#e3f0ff, var(--surface-elevated-dark, #101010));
+    background-color: light-dark(#e3f0ff, var(--surface-elevated-dark, #1a1a1a));
 
     box-shadow:
-      -0.5px 0 1px 0 light-dark(rgb(250, 250, 250), rgba(15, 23, 42, 0.8)) inset,
-      0px 0 1px 0 light-dark(#fff, rgba(71, 85, 105, 0.3)) inset,
-      -3px 0 1px 0 light-dark(rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.3)),
-      -2px 0 1px 0 light-dark(rgba(9, 10, 11, 0.01), rgba(0, 0, 0, 0.2)),
-      -1px 0 1px 0 light-dark(rgba(9, 10, 11, 0.03), rgba(0, 0, 0, 0.25));
+      -0.5px 0 1px 0 light-dark(rgb(250, 250, 250), rgba(255, 255, 255, 0.04)) inset,
+      0px 0 1px 0 light-dark(#fff, rgba(255, 255, 255, 0.02)) inset,
+      -3px 0 20px 0 light-dark(rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.65)),
+      -2px 0 12px 0 light-dark(rgba(9, 10, 11, 0.01), rgba(0, 0, 0, 0.45)),
+      -1px 0 6px 0 light-dark(rgba(9, 10, 11, 0.03), rgba(0, 0, 0, 0.35));
 
     // display: flex;
     // flex-direction: column;
@@ -691,8 +704,8 @@
         line-height: 0.85;
         padding: 0.5rem;
         border-radius: 0.5rem;
-        background: light-dark(#d7e1fd, rgba(129, 146, 255, 0.2));
-        color: light-dark(#678fff, var(--accent-dark, #8192ff));
+        background: light-dark(#d7e1fd, rgba(143, 143, 143, 0.2));
+        color: light-dark(#678fff, var(--on-surface-dark, #e4e7f2));
       }
     }
 
@@ -702,17 +715,17 @@
       outline: none;
       border-radius: 0.5rem;
       background: none;
-      color: light-dark(var(--color-link), var(--accent-dark, #8192ff));
+      color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
 
       transition: color 0.2s;
       font-size: 1.1rem;
 
       &:hover {
-        color: light-dark(var(--color-link-dark), var(--accent, #6d82ff));
+        color: light-dark(var(--color-text-muted), var(--on-surface-dark, #ffffff));
       }
       &:disabled {
         cursor: not-allowed;
-        color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #94a3b8));
+        color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #9da4c4));
       }
     }
   }
@@ -723,16 +736,16 @@
     justify-content: space-between;
     background-color: light-dark(
       var(--color-background-light),
-      var(--surface-elevated-dark, #101010)
+      var(--surface-elevated-dark, #1a1a1a)
     );
-    border-bottom: 1px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
+    border-bottom: 1px solid light-dark(var(--color-border), var(--settings-dark-border));
     border-radius: 1.25rem;
     padding: 1rem 1.25rem;
     text-align: center;
     width: 100%;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
+    color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
 
     button {
       padding: 8px 16px;
@@ -743,13 +756,13 @@
       font-weight: 500;
 
       transition: all 0.3s ease;
-      background: radial-gradient(
-        circle at 50% -50%,
-        rgba(215, 143, 215, 1) 0%,
-        rgba(45, 150, 205, 1) 35%,
-        rgba(74, 144, 226, 1) 100%
+      background: linear-gradient(
+        130deg,
+        rgba(60, 60, 60, 0.95) 0%,
+        rgba(80, 80, 80, 0.85) 40%,
+        rgba(100, 100, 100, 0.95) 100%
       );
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
       text-transform: uppercase;
       letter-spacing: 1px;
       position: relative;
@@ -799,7 +812,7 @@
     padding: 1rem;
     margin: 1rem 0;
     box-shadow:
-      0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+      0 -0.5px 1px 0 rgba(255, 255, 255, 0.1) inset,
       0 1px 1px 0 #fff inset,
       0 3px 3px 0 rgba(62, 71, 80, 0.02),
       0 1px 2px 0 rgba(62, 71, 80, 0.02),
@@ -810,19 +823,9 @@
       box-shadow 90ms ease-out;
 
     @media (prefers-color-scheme: dark) {
-      background: radial-gradient(
-        290.88% 100% at 50% 0%,
-        rgba(30, 41, 59, 0.96) 0%,
-        rgba(15, 23, 42, 0.93) 100%
-      );
-      border: 0.5px solid rgba(71, 85, 105, 0.6);
-      box-shadow:
-        0 -0.5px 1px 0 rgba(129, 146, 255, 0.15) inset,
-        0 1px 1px 0 rgba(71, 85, 105, 0.3) inset,
-        0 3px 3px 0 rgba(0, 0, 0, 0.3),
-        0 1px 2px 0 rgba(0, 0, 0, 0.2),
-        0 1px 1px 0 rgba(0, 0, 0, 0.4),
-        0 0 1px 0 rgba(0, 0, 0, 0.5);
+      background: var(--settings-dark-card);
+      border: 0.5px solid var(--settings-dark-border);
+      box-shadow: var(--settings-dark-card-shadow);
     }
   }
 
@@ -843,7 +846,7 @@
 
     p {
       font-size: 1.1rem;
-      color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #94a3b8));
+      color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #9da4c4));
     }
   }
 
@@ -867,12 +870,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
+    color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
 
     transition: color 0.2s;
 
     &:hover {
-      color: light-dark(var(--color-link), var(--accent-dark, #8192ff));
+      color: light-dark(var(--color-text-muted), var(--on-surface-dark, #ffffff));
     }
   }
 
@@ -892,16 +895,16 @@
     overflow: auto;
     width: 100%;
     padding: 1rem;
-    border: 1px solid light-dark(var(--color-border), rgba(71, 85, 105, 0.4));
+    border: 1px solid light-dark(var(--color-border), var(--settings-dark-border));
     border-radius: 8px;
-    background: light-dark(var(--color-background-light), var(--surface-elevated-dark, #101010));
-    color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
+    background: light-dark(var(--color-background-light), var(--surface-elevated-dark, #1a1a1a));
+    color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
     outline: none;
     font-size: 1rem;
     font-family: inherit;
 
     &:focus {
-      border-color: light-dark(var(--color-brand-light), var(--accent-dark, #8192ff));
+      border-color: light-dark(var(--color-border), var(--settings-dark-border-strong));
     }
   }
 

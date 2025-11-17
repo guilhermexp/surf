@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { translator as t } from '../../Core/i18n'
+
   export let used: number
   export let total: number
   export let label: string = ''
@@ -39,8 +41,8 @@
 
   {#if showValues && !label && !showPercentage}
     <div class="bar-footer">
-      <span>{used} used</span>
-      <span>{remaining} remaining</span>
+      <span>{used} {$t('common.usage.used')}</span>
+      <span>{remaining} {$t('common.usage.remaining')}</span>
     </div>
   {/if}
 </div>
@@ -49,10 +51,10 @@
   :root {
     --usage-good: light-dark(#10b981, #34d399);
     --usage-warning: light-dark(#f59e0b, #fbbf24);
-    --usage-danger: light-dark(#ef4444, #f87171);
-    --usage-bg: light-dark(#e5e7eb, rgba(51, 65, 85, 0.5));
-    --usage-text: light-dark(#374151, #cbd5f5);
-    --usage-text-muted: light-dark(#6b7280, #94a3b8);
+    --usage-danger: light-dark(#ef4444, #888888);
+    --usage-bg: light-dark(#e5e7eb, rgba(8, 13, 24, 0.8));
+    --usage-text: light-dark(#374151, #e4e7f2);
+    --usage-text-muted: light-dark(#6b7280, #9da4c4);
     --usage-white: light-dark(#ffffff, #e5edff);
   }
 

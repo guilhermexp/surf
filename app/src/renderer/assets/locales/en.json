@@ -1,0 +1,242 @@
+{
+  "app": {
+    "name": "Surf",
+    "shell": {
+      "navigation": {
+        "back": "Back",
+        "forward": "Forward",
+        "refresh": "Reload",
+        "home": "Home",
+        "searchPlaceholder": "Search or enter address",
+        "openSettings": "Settings"
+      },
+      "tabs": {
+        "newTab": "New Tab",
+        "closeTab": "Close Tab",
+        "reopenTab": "Reopen Closed Tab",
+        "toggleSidebar": "Toggle Sidebar"
+      },
+      "menu": {
+        "file": "File",
+        "edit": "Edit",
+        "view": "View",
+        "history": "History",
+        "window": "Window",
+        "help": "Help"
+      }
+    }
+  },
+  "settings": {
+    "tabs": {
+      "general": "General",
+      "ai": "AI",
+      "appearance": "Appearance"
+    },
+    "general": {
+      "heading": "General",
+      "dev": {
+        "migration": "Migration",
+        "runMigration": "Run migration",
+        "completed": "Migration complete!"
+      },
+      "help": {
+        "title": "Share your email with us",
+        "message": "Accepting will share your email with us and allow us to contact you based on your Surf usage. No spam, we promise.<br><br>(Surf will restart after accepting.)",
+        "accept": "Accept"
+      },
+      "language": {
+        "label": "Language",
+        "description": "Choose the language used throughout Surf.",
+        "options": {
+          "en": "English",
+          "pt": "Português"
+        }
+      },
+      "darkMode": {
+        "title": "Dark mode",
+        "description": "Enable dark appearance for the application."
+      },
+      "searchEngine": {
+        "title": "Default search engine"
+      },
+      "licenses": {
+        "title": "Open source licenses and notices"
+      },
+      "misc": {
+        "title": "Miscellaneous"
+      }
+    },
+    "teletype": {
+      "title": "TeleType default action",
+      "description": "Choose how the command bar selects actions by default.",
+      "options": {
+        "auto": {
+          "label": "Auto (smart)",
+          "description": "Automatically select based on query type."
+        },
+        "ask": {
+          "label": "Always ask Surf",
+          "description": "Always default to the Ask Surf action."
+        },
+        "search": {
+          "label": "Always web search",
+          "description": "Always default to the Search Web action."
+        }
+      }
+    },
+    "smartNotes": {
+      "title": "Surf Notes",
+      "description": "Access context-aware Surf AI features like auto-completion, citation generation, and more directly within your Surf notes.",
+      "moreInfo": "More information",
+      "sidebar": {
+        "title": "Notes sidebar",
+        "description": "Create and view Surf notes in the sidebar, replacing the old chat interface."
+      },
+      "dialog": {
+        "enableTitle": "Enable notes sidebar",
+        "disableTitle": "Disable notes sidebar",
+        "enableMessage": "Surf needs to restart to enable the experimental notes sidebar.",
+        "disableMessage": "Surf needs to restart to return to the chat sidebar.",
+        "enableAction": "Enable and restart",
+        "disableAction": "Disable and restart"
+      },
+      "chatInput": {
+        "title": "Sidebar chat input (experimental)",
+        "description": "Show a traditional chat input in the notes sidebar."
+      }
+    },
+    "contextLinking": {
+      "title": "Linked contexts",
+      "description": "Link contexts together to easily navigate between them."
+    },
+    "appearance": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "modelSettings": {
+      "activeModel": {
+        "title": "Active model",
+        "select": "Select model",
+        "description": "Your selected model is used across Surf. We may switch to more efficient options from the same provider for certain features."
+      },
+      "configure": {
+        "title": "Configure models",
+        "description": "Provide an API key for built-in providers or add your own custom models.",
+        "manual": "manual"
+      },
+      "status": {
+        "apiKeyUpdated": "{provider} API key updated successfully.",
+        "apiKeyCleared": "{provider} API key cleared."
+      },
+      "fields": {
+        "apiKey": "API key",
+        "apiKeyPlaceholder": "Your API key",
+        "optionalApiKeyPlaceholder": "Optional API key",
+        "apiKeyExample": "sk-ant-api03-...",
+        "apiEndpoint": "API endpoint"
+      },
+      "modelListTitle": "Available models:",
+      "actions": {
+        "getKey": "Get key",
+        "viewList": "View list"
+      },
+      "claude": {
+        "description": "uses the official Claude SDK with file system access. Choose a specific model (Sonnet 4.5 or Haiku 4.5) or use “Auto” to let the SDK decide.",
+        "recommendedLabel": "Recommended:",
+        "recommendation": "Claude Code Agent Haiku 4.5 for faster responses and lower cost."
+      },
+      "customModels": {
+        "title": "Custom models",
+        "customLabel": "Custom",
+        "add": "Add model",
+        "empty": "No custom models configured yet. Add one to get started.",
+        "fields": {
+          "label": "Model label",
+          "labelPlaceholder": "My Custom Model",
+          "labelHelp": "Give your custom model a name so you can identify it within Surf's UI.",
+          "modelId": "Model ID",
+          "providerModelId": "Provider model ID",
+          "providerModelHelp": "The ID of the model from the provider's API.",
+          "endpoint": "API endpoint",
+          "endpointHelp": "Full URL of the model provider's OpenAI-compatible API endpoint.",
+          "contextSize": "Context size (tokens)",
+          "contextSizeHelp": "Maximum number of tokens the model supports.",
+          "supportsVision": "Supports vision",
+          "supportsVisionHelp": "Whether the model supports vision features like image tagging.",
+          "supportsJson": "Supports JSON format",
+          "supportsJsonHelp": "Whether the model supports returning JSON-formatted output."
+        }
+      },
+      "delete": {
+        "title": "Delete <i>{model}</i>",
+        "message": "This can't be undone."
+      }
+    }
+  },
+  "core": {
+    "sidebar": {
+      "status": {
+        "open": "Sidebar open"
+      },
+      "actions": {
+        "show": "Show sidebar",
+        "pin": "Pin sidebar",
+        "autoHide": "Enable auto-hide"
+      }
+    },
+    "navigation": {
+      "askButton": "Ask"
+    },
+    "locationBar": {
+      "appName": "Surf",
+      "notebook": "Notebook",
+      "resource": "Resource"
+    },
+    "downloads": {
+      "completed": "Download completed"
+    },
+    "saveState": {
+      "add": "Add to Surf",
+      "added": "Added to Surf!",
+      "searchNotebooks": "Search notebooks to add to..."
+    },
+    "tabs": {
+      "context": {
+        "reload": "Reload tab",
+        "copyUrl": "Copy URL",
+        "openInSidebar": "Open in sidebar",
+        "close": "Close tab"
+      },
+      "untitled": "Untitled"
+    }
+  },
+  "dialogs": {
+    "confirm": {
+      "title": "Are you sure?",
+      "message": "This action cannot be undone."
+    },
+    "languageSaved": {
+      "title": "Language updated",
+      "message": "Your language preference has been saved."
+    }
+  },
+  "common": {
+    "actions": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "close": "Close",
+      "save": "Save",
+      "delete": "Delete"
+    },
+    "labels": {
+      "optional": "optional"
+    },
+    "usage": {
+      "used": "used",
+      "remaining": "remaining"
+    },
+    "status": {
+      "loading": "Loading..."
+    }
+  }
+}

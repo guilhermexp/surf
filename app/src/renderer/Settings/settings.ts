@@ -7,6 +7,7 @@ import '@deta/ui/src/output.css'
 import '@deta/ui/src/app.css'
 import Settings from './Settings.svelte'
 import { mount } from 'svelte'
+import { initLocalization, SUPPORTED_LOCALES } from '../Core/i18n'
 
 /*
 import * as Sentry from '@sentry/electron/renderer'
@@ -25,8 +26,29 @@ if (sentryDSN) {
 }
 */
 
-const app = mount(Settings, {
-  target: document.getElementById('app')
+let app: ReturnType<typeof mount> | undefined
+
+const bootstrap = async () => {
+  try {
+    const userConfig = window.api.getUserConfig()
+    const initialLocale = userConfig?.settings?.language ?? 'en'
+
+    await initLocalization({
+      defaultLocale: 'en',
+      supportedLocales: SUPPORTED_LOCALES,
+      initialLocale
+    })
+  } catch (error) {
+    console.error('[settings] Failed to initialize localization, continuing with defaults', error)
+  }
+
+  app = mount(Settings, {
+    target: document.getElementById('app')
+  })
+}
+
+bootstrap().catch((error) => {
+  console.error('[settings] Failed to bootstrap renderer', error)
 })
 
 export default app

@@ -3,6 +3,7 @@
   import { useDownloadsManager } from '@deta/services'
   import type { DownloadState } from '@deta/types'
   import { Button } from '@deta/ui'
+  import { translator as t } from '../../i18n'
 
   const downloadsManager = useDownloadsManager()
 
@@ -15,7 +16,7 @@
     {#if downloadState === 'completed'}
       <div class="download-indicator-label">
         <Icon name="check" />
-        Download completed
+        {$t('core.downloads.completed')}
       </div>
     {:else if downloadState === 'progressing'}
       <div class="download-indicator-label">

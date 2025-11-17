@@ -3,6 +3,7 @@
   import { Icon, type Icons } from '@deta/icons'
   import { openDialog } from '@deta/ui'
   import { createEventDispatcher } from 'svelte'
+  import { translator as t } from '../../Core/i18n'
 
   const dispatch = createEventDispatcher<{ update: boolean }>()
 
@@ -33,13 +34,13 @@
 
     const { title, message } = getDialogMessage
       ? getDialogMessage(newValue)
-      : { title: 'Are you Sure?', message: '' }
+      : { title: $t('dialogs.confirm.title'), message: $t('dialogs.confirm.message') }
     const { closeType: confirmed } = await openDialog({
       title: title,
       message: message,
       actions: [
-        { title: 'Cancel', type: 'reset' },
-        { title: 'Confirm', type: 'submit' }
+        { title: $t('common.actions.cancel'), type: 'reset' },
+        { title: $t('common.actions.confirm'), type: 'submit' }
       ]
     })
 
@@ -74,7 +75,7 @@
 
     {#if value !== undefined}
       <Switch
-        color="#ff4eed"
+        color="#ffffff"
         bind:checked={localValue}
         on:update={(e) => handleValueChange(e.detail)}
       />
@@ -109,14 +110,14 @@
         h2 {
           font-size: 1.2rem;
           font-weight: 500;
-          color: light-dark(var(--color-text), var(--on-surface-dark, #cbd5f5));
+          color: light-dark(var(--color-text), var(--on-surface-dark, #e4e7f2));
         }
       }
 
       p {
         font-size: 1.1rem;
         opacity: 0.6;
-        color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #94a3b8));
+        color: light-dark(var(--color-text-muted), var(--text-subtle-dark, #9da4c4));
       }
     }
   }

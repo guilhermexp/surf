@@ -2,6 +2,7 @@
   import light from '../../assets/light.webp'
   import dark from '../../assets/dark.webp'
   import { createEventDispatcher } from 'svelte'
+  import { translator as t } from '../../Core/i18n'
 
   type AppStyle = 'light' | 'dark'
 
@@ -34,14 +35,14 @@
     <label for="light">
       <img src={light} alt="light" class="w-full h-48 object-cover" />
     </label>
-    <span>Light</span>
+    <span>{$t('settings.appearance.light')}</span>
   </div>
   <div class="radio-item">
     <input type="radio" id="dark" name="radio-group-app_style" value="dark" bind:group={style} />
     <label for="dark">
       <img src={dark} alt="dark" />
     </label>
-    <span>Dark</span>
+    <span>{$t('settings.appearance.dark')}</span>
   </div>
 </div>
 
@@ -93,7 +94,7 @@
     background-color: #eff5ff;
   }
   .radio-item input[type='radio']:checked + label {
-    outline: 4px solid rgba(59, 130, 246, 0.8);
+    outline: 4px solid rgba(255, 255, 255, 0.8);
     color: #fff;
   }
   .radio-item input[type='radio']:checked + label span {

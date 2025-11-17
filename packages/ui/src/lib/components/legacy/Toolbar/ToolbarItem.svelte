@@ -34,7 +34,7 @@
   {#if type == 'return'}
     <div class="item-return" class:disabled={!url}>
       <div class="icon-wrapper">
-        <Icon name="arrowbackup" color={active ? '#ffffff' : '#e173a8'} />
+        <Icon name="arrowbackup" color={active ? '#ffffff' : '#888888'} />
       </div>
       {name}
     </div>
@@ -50,7 +50,7 @@
       <div class="right">
         <span class="service">{name}</span>
         <div class="icon-wrapper">
-          <Icon name="search" color={active ? '#FFFFFF' : '#e173a8'} />
+          <Icon name="search" color={active ? '#FFFFFF' : '#888888'} />
         </div>
       </div>
     </div>
@@ -64,7 +64,7 @@
       <div class="right">
         <span class="service">{name}</span>
         <div class="icon-wrapper">
-          <Icon name="sparkles" color={active ? '#FFFFFF' : '#e173a8'} />
+          <Icon name="sparkles" color={active ? '#FFFFFF' : '#888888'} />
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
       <div class="right">
         <div class="service">Open Directly</div>
         <div class="icon-wrapper">
-          <Icon name="arrow" color={active ? '#FFFFFF' : '#e173a8'} />
+          <Icon name="arrow" color={active ? '#FFFFFF' : '#888888'} />
         </div>
       </div>
     </div>
@@ -108,14 +108,14 @@
     font-size: 14px;
     border-radius: 4px;
     &:hover {
-      background: #fdd8ea;
+      background: #e0e0e0;
     }
 
     .item-return {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #e173a8;
+      color: #888888;
       .icon-wrapper {
         display: flex;
         align-items: center;
@@ -124,7 +124,7 @@
     }
     &.active {
       color: #ffffff;
-      background: #f73b95;
+      background: #888888;
 
       .icon-wrapper {
         opacity: 1;
@@ -214,7 +214,7 @@
       gap: 4px;
       justify-content: center;
       align-items: center;
-      color: #e173a8;
+      color: #888888;
       .icon-wrapper {
         display: flex;
         align-items: center;

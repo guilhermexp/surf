@@ -5,7 +5,7 @@ pub mod tunnel;
 const _MODULE_PREFIX: &str = "backend";
 
 use crate::{
-    ai::AI,
+    ai::{claude_agent::{ClaudeAgentRunnerHandle, ClaudeAgentRuntime}, AI},
     api::message::{
         AIMessage, EventBusMessage, ProcessorMessage, TunnelMessage, TunnelOneshot, WorkerMessage,
     },
@@ -91,6 +91,7 @@ pub struct WorkerConfig {
     pub language_setting: String,
     pub run_migrations: bool,
     pub surf_backend_health: SurfBackendHealth,
+    pub claude_agent_runner: ClaudeAgentRunnerHandle,
 }
 
 pub struct Worker {
@@ -117,11 +118,18 @@ impl Worker {
         let resources_path = config.path_config.resources_path();
         let local_ai_socket_path = config.path_config.local_ai_socket_path();
 
+        let channel = config.channel_config.channel.clone();
+        let claude_agent_runtime = ClaudeAgentRuntime::new(
+            config.claude_agent_runner.clone(),
+            channel.clone(),
+            config.path_config.app_path.clone(),
+        );
+
         Ok(Self {
             db: Database::new(&db_path, config.run_migrations)?,
             kv: KeyValueStore::new(&kv_db_path)?,
-            ai: AI::new(local_ai_socket_path)?,
-            channel: config.channel_config.channel,
+            ai: AI::new(local_ai_socket_path, Some(claude_agent_runtime))?,
+            channel,
             event_bus_rx: config.channel_config.event_bus_rx,
             tqueue_tx: config.channel_config.tqueue_tx,
             aiqueue_tx: config.channel_config.aiqueue_tx,

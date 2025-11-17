@@ -5,6 +5,7 @@
   import { Icon } from '@deta/icons'
   import { createEventDispatcher } from 'svelte'
   import { openDialog } from '@deta/ui'
+  import { translator as t } from '../../Core/i18n'
 
   export let userConfigSettings: UserSettings
 
@@ -18,14 +19,18 @@
 
     const { closeType: confirmed } = await openDialog({
       icon: 'sidebar.right',
-      title: value ? 'Enable Notes Sidebar' : 'Disable Notes Sidebar',
+      title: value
+        ? $t('settings.smartNotes.dialog.enableTitle')
+        : $t('settings.smartNotes.dialog.disableTitle'),
       message: value
-        ? 'To use the experimental notes sidebar Surf needs to restart.'
-        : 'To use the chat sidebar again Surf needs to restart.',
+        ? $t('settings.smartNotes.dialog.enableMessage')
+        : $t('settings.smartNotes.dialog.disableMessage'),
       actions: [
-        { title: 'Cancel', type: 'reset' },
+        { title: $t('common.actions.cancel'), type: 'reset' },
         {
-          title: value ? 'Enable and Restart' : 'Disable and Restart',
+          title: value
+            ? $t('settings.smartNotes.dialog.enableAction')
+            : $t('settings.smartNotes.dialog.disableAction'),
           type: 'submit',
           kind: value ? 'submit' : 'danger'
         }
@@ -44,12 +49,11 @@
   $: localUseSidebar = userConfigSettings.experimental_notes_chat_sidebar
 </script>
 
-<SettingsOption icon="file-text-ai" title="Surf Notes" on:update>
+<SettingsOption icon="file-text-ai" title={$t('settings.smartNotes.title')} on:update>
   <p slot="description">
-    Access context-aware Surf AI features like auto completion, citation generation, and more from
-    within your Surf notes. <a
-      href="https://deta.notion.site/Smart-Notes-17da5244a717805c8525eec0d42f7598"
-      target="_blank">More information</a
+    {$t('settings.smartNotes.description')}
+    <a href="https://deta.notion.site/Smart-Notes-17da5244a717805c8525eec0d42f7598" target="_blank"
+      >{$t('settings.smartNotes.moreInfo')}</a
     >
   </p>
 
@@ -57,12 +61,12 @@
     <div class="info">
       <div class="title">
         <Icon name="sidebar.right" size="20px" stroke-width="2" />
-        <h3>Notes Sidebar</h3>
+        <h3>{$t('settings.smartNotes.sidebar.title')}</h3>
       </div>
-      <p>Create and view Surf notes in the sidebar replacing the old chat interface.</p>
+      <p>{$t('settings.smartNotes.sidebar.description')}</p>
     </div>
 
-    <Switch color="#ff4eed" bind:checked={localUseSidebar} on:update={handleToggleNotesSidebar} />
+    <Switch color="#ffffff" bind:checked={localUseSidebar} on:update={handleToggleNotesSidebar} />
   </section>
 
   {#if userConfigSettings.experimental_notes_chat_sidebar}
@@ -70,13 +74,13 @@
       <div class="info">
         <div class="title">
           <Icon name="chat" size="20px" stroke-width="2" />
-          <h3>Sidebar Chat Input (experimental)</h3>
+          <h3>{$t('settings.smartNotes.chatInput.title')}</h3>
         </div>
-        <p>Show a traditional chat input in the notes sidebar.</p>
+        <p>{$t('settings.smartNotes.chatInput.description')}</p>
       </div>
 
       <Switch
-        color="#ff4eed"
+        color="#ffffff"
         bind:checked={userConfigSettings.experimental_notes_chat_input}
         on:update
       />

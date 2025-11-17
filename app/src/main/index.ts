@@ -107,7 +107,8 @@ const registerProtocols = () => {
 const handleOpenUrl = (url: string) => {
   try {
     if (!isAppSetup) {
-      log.warn('App not setup yet, cannot handle open URL')
+      log.warn('App not setup yet, scheduling open URL for later')
+      appOpenedWithURL = url
       return
     }
 
@@ -128,6 +129,7 @@ const handleOpenUrl = (url: string) => {
     mainWindow.focus()
 
     IPC_EVENTS_MAIN.openURL.sendToWebContents(mainWindow.webContents, { url, active: true })
+    appOpenedWithURL = null
   } catch (error) {
     log.error('Error handling open URL:', error)
   }
@@ -205,6 +207,9 @@ const initializeApp = async () => {
   }
 
   markAppAsSetup()
+  if (appOpenedWithURL) {
+    handleOpenUrl(appOpenedWithURL)
+  }
   await setupAdblocker()
   setAppMenu()
 

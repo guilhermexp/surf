@@ -8,6 +8,7 @@ import { esbuildConsolidatePreloads } from './plugins/merge-chunks'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import { createConcatLicensesPlugin, createLicensePlugin } from './plugins/license'
 import { createRustLicensePlugin } from './plugins/rust-license'
+import type { DeprecationOrId } from 'sass'
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -23,11 +24,13 @@ const svelteOptions = silenceWarnings
     }
   : {}
 
+const silencedDeprecations: DeprecationOrId[] = ['legacy-js-api', 'mixed-decls']
+
 const cssConfig = silenceWarnings
   ? {
       preprocessorOptions: {
         scss: {
-          silenceDeprecations: ['legacy-js-api', 'mixed-decls']
+          silenceDeprecations: silencedDeprecations
         }
       }
     }

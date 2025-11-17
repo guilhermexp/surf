@@ -207,7 +207,7 @@
         )
       );
       box-shadow: light-dark(
-        0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+        0 -0.5px 1px 0 rgba(255, 255, 255, 0.15) inset,
         0 1px 1px 0 #fff inset,
         0 12px 5px 0 #3e4750,
         0 7px 4px 0 rgba(62, 71, 80, 0.01),
@@ -321,7 +321,7 @@
         )
       );
       box-shadow: light-dark(
-        0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+        0 -0.5px 1px 0 rgba(255, 255, 255, 0.15) inset,
         0 1px 1px 0 #fff inset,
         0 12px 5px 0 #3e4750,
         0 7px 4px 0 rgba(62, 71, 80, 0.01),

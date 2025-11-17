@@ -5,6 +5,7 @@ export enum Provider {
   OpenAI = 'open-ai',
   Anthropic = 'anthropic',
   Google = 'google',
+  ClaudeAgent = 'claude-agent',
   Custom = 'custom'
 }
 
@@ -22,6 +23,9 @@ export enum BuiltInModelIDs {
   ClaudeSonnet4 = 'claude-4-sonnet-latest',
   ClaudeSonnet37 = 'claude-3-7-sonnet-latest',
   ClaudeHaiku = 'claude-3-5-haiku-latest',
+  ClaudeCodeAgent = 'claude-code-agent',
+  ClaudeCodeAgentSonnet45 = 'claude-sonnet-4-5-20250929',
+  ClaudeCodeAgentHaiku45 = 'claude-haiku-4-5-20251001',
   Gemini2Flash = 'gemini-2.0-flash'
 }
 
@@ -185,6 +189,9 @@ export const BuiltInModelLabels = {
   [BuiltInModelIDs.GPT5_Mini]: 'GPT-5 Mini',
   [BuiltInModelIDs.ClaudeSonnet45]: 'Claude 4.5 Sonnet',
   [BuiltInModelIDs.ClaudeSonnet4]: 'Claude 4 Sonnet',
+  [BuiltInModelIDs.ClaudeCodeAgent]: 'Claude Code Agent (Auto)',
+  [BuiltInModelIDs.ClaudeCodeAgentSonnet45]: 'Claude Code Agent Sonnet 4.5',
+  [BuiltInModelIDs.ClaudeCodeAgentHaiku45]: 'Claude Code Agent Haiku 4.5',
   [BuiltInModelIDs.Gemini2Flash]: 'Gemini 2.0 Flash'
 }
 
@@ -192,6 +199,7 @@ export const ProviderLabels = {
   [Provider.OpenAI]: 'Open AI',
   [Provider.Anthropic]: 'Anthropic',
   [Provider.Google]: 'Google',
+  [Provider.ClaudeAgent]: 'Claude Code Agent',
   [Provider.Custom]: 'Custom'
 }
 
@@ -199,6 +207,7 @@ export const ProviderIcons = {
   [Provider.OpenAI]: 'open-ai',
   [Provider.Anthropic]: 'claude',
   [Provider.Google]: 'gemini',
+  [Provider.ClaudeAgent]: 'claude',
   [Provider.Custom]: 'sparkles'
 }
 
@@ -331,6 +340,33 @@ export const BUILT_IN_MODELS = [
     vision: false
   },
   {
+    id: BuiltInModelIDs.ClaudeCodeAgent,
+    label: BuiltInModelLabels[BuiltInModelIDs.ClaudeCodeAgent],
+    provider: Provider.ClaudeAgent,
+    tier: ModelTiers.Premium,
+    icon: ProviderIcons[Provider.ClaudeAgent],
+    supports_json_format: false,
+    vision: true
+  },
+  {
+    id: BuiltInModelIDs.ClaudeCodeAgentSonnet45,
+    label: BuiltInModelLabels[BuiltInModelIDs.ClaudeCodeAgentSonnet45],
+    provider: Provider.ClaudeAgent,
+    tier: ModelTiers.Premium,
+    icon: ProviderIcons[Provider.ClaudeAgent],
+    supports_json_format: false,
+    vision: true
+  },
+  {
+    id: BuiltInModelIDs.ClaudeCodeAgentHaiku45,
+    label: BuiltInModelLabels[BuiltInModelIDs.ClaudeCodeAgentHaiku45],
+    provider: Provider.ClaudeAgent,
+    tier: ModelTiers.Standard,
+    icon: ProviderIcons[Provider.ClaudeAgent],
+    supports_json_format: false,
+    vision: true
+  },
+  {
     id: BuiltInModelIDs.Gemini2Flash,
     label: BuiltInModelLabels[BuiltInModelIDs.Gemini2Flash],
     provider: Provider.Google,
@@ -341,7 +377,7 @@ export const BUILT_IN_MODELS = [
   }
 ] as Model[]
 
-export const DEFAULT_AI_MODEL = BuiltInModelIDs.GPT4_1
+export const DEFAULT_AI_MODEL = BuiltInModelIDs.ClaudeCodeAgentHaiku45
 
 export const RECOMMENDED_AI_MODELS = [
   {
@@ -424,6 +460,9 @@ export const BUILT_IN_PROVIDER_DEFINITIONS: Record<Provider, ProviderDefinition>
   },
   [Provider.Google]: {
     api_key_page: 'https://aistudio.google.com/app/api-keys'
+  },
+  [Provider.ClaudeAgent]: {
+    api_key_page: 'https://console.anthropic.com/settings/keys'
   },
   [Provider.Custom]: {}
 }

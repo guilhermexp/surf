@@ -25,6 +25,7 @@
   import { onMount, tick } from 'svelte'
   import { SvelteMap } from 'svelte/reactivity'
   import { type Fn, ViewType } from '@deta/types'
+  import { translator as t } from '../../i18n'
 
   let {
     view,
@@ -57,7 +58,9 @@
 
     if ($viewTypeData.type === ViewType.Notebook || $viewTypeData.type === ViewType.NotebookHome) {
       if ($viewTitle.startsWith('surf://')) {
-        return $viewTypeData.type === ViewType.NotebookHome ? 'Surf' : 'Notebook'
+        return $viewTypeData.type === ViewType.NotebookHome
+          ? $t('core.locationBar.appName')
+          : $t('core.locationBar.notebook')
       }
 
       return truncate($viewTitle, 69)
@@ -66,18 +69,18 @@
     if ($viewTypeData.type === ViewType.Resource) {
       if ($viewTypeData.raw) {
         if (!isActiveLocationInternalRenderer) {
-          return 'Resource'
+          return $t('core.locationBar.resource')
         }
 
         if (isActiveLocationInternalRenderer.href.startsWith('surf://')) {
-          return 'Resource'
+          return $t('core.locationBar.resource')
         }
 
         return truncate(isActiveLocationInternalRenderer.href, 69)
       }
 
       if ($viewTitle.startsWith('surf://')) {
-        return 'Resource'
+        return $t('core.locationBar.resource')
       }
 
       return truncate($viewTitle, 69)

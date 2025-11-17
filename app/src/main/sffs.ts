@@ -1,5 +1,6 @@
 import { app } from 'electron'
 import { initBackend } from '../preload/helpers/backend'
+import { registerClaudeAgentBridge } from './claudeAgent'
 import { isDev } from '@deta/utils/system'
 import type {
   SFFSRawCompositeResource,
@@ -132,6 +133,7 @@ export const initializeSFFSMain = () => {
     appPath: `${app.getAppPath()}${isDev ? '' : '.unpacked'}`
   })
 
+  registerClaudeAgentBridge(result.sffs)
   ;(result.sffs as any).js__backend_set_surf_backend_health(true)
 
   sffsMain = new SFFSMain(result.sffs, result.resources)

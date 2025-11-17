@@ -43,6 +43,68 @@
 
   let unsubs: Fn[] = []
   let activeTabNavigationBar: NavigationBar | undefined
+  type VerticalTabsBehavior = 'pinned' | 'hover'
+  let verticalTabsBehavior: VerticalTabsBehavior = $state('pinned')
+  let verticalTabsCollapsed = $state(false)
+  let verticalTabsHoverActive = $state(false)
+  const shouldRenderVerticalTabsShell = $derived($tabOrientation === TabOrientation.Vertical)
+  const verticalTabsExpanded = $derived(
+    verticalTabsBehavior === 'hover' ? verticalTabsHoverActive : !verticalTabsCollapsed
+  )
+
+  const persistVerticalTabsCollapsed = (collapsed: boolean) => {
+    verticalTabsCollapsed = collapsed
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage?.setItem('verticalTabsCollapsed', collapsed.toString())
+      } catch (error) {
+        console.warn('Failed to persist vertical tabs collapse state', error)
+      }
+    }
+  }
+
+  const setVerticalTabsBehavior = (behavior: VerticalTabsBehavior) => {
+    verticalTabsBehavior = behavior
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage?.setItem('verticalTabsBehavior', behavior)
+      } catch (error) {
+        console.warn('Failed to persist vertical tabs behavior', error)
+      }
+    }
+
+    if (behavior === 'hover') {
+      persistVerticalTabsCollapsed(true)
+    } else {
+      persistVerticalTabsCollapsed(false)
+      verticalTabsHoverActive = false
+    }
+  }
+
+  const toggleVerticalTabsBehavior = () => {
+    setVerticalTabsBehavior(verticalTabsBehavior === 'hover' ? 'pinned' : 'hover')
+  }
+
+  const toggleVerticalTabsCollapsed = () => {
+    if (verticalTabsBehavior === 'hover') {
+      setVerticalTabsBehavior('pinned')
+      return
+    }
+
+    persistVerticalTabsCollapsed(!verticalTabsCollapsed)
+  }
+
+  const handleVerticalTabsMouseEnter = () => {
+    if (verticalTabsBehavior === 'hover') {
+      verticalTabsHoverActive = true
+    }
+  }
+
+  const handleVerticalTabsMouseLeave = () => {
+    if (verticalTabsBehavior === 'hover') {
+      verticalTabsHoverActive = false
+    }
+  }
 
   // TODO: move into searchinput directly?
   const handleSearchInput = useDebounce((value: string) => {
@@ -57,6 +119,28 @@
       document.documentElement.style.colorScheme = appStyle
     })
     return unsubscribe
+  })
+
+  onMount(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const storedBehavior = window.localStorage?.getItem('verticalTabsBehavior')
+      if (storedBehavior === 'hover' || storedBehavior === 'pinned') {
+        verticalTabsBehavior = storedBehavior
+      }
+
+      const storedCollapsed = window.localStorage?.getItem('verticalTabsCollapsed')
+      if (storedCollapsed !== null) {
+        verticalTabsCollapsed = storedCollapsed === 'true'
+      }
+
+      if (verticalTabsBehavior === 'hover') {
+        verticalTabsCollapsed = true
+      }
+    } catch (error) {
+      console.warn('Failed to restore vertical tabs preferences', error)
+    }
   })
 
   onMount(() => {
@@ -262,6 +346,12 @@
   $inspect(tabsService.activatedTabs).with((...e) => {
     log.debug('activated tabs changed:', e)
   })
+
+  $effect(() => {
+    if (!shouldRenderVerticalTabsShell) {
+      verticalTabsHoverActive = false
+    }
+  })
 </script>
 
 <svelte:window onkeydown={keyboardManager.handleKeyDown} />
@@ -289,10 +379,46 @@
   {/if}
 
   <main class:vertical-layout={$tabOrientation === TabOrientation.Vertical}>
-    {#if $tabOrientation === TabOrientation.Vertical}
-      <div class="vertical-tabs-container">
-        <TabsListWrapper orientation={$tabOrientation} />
-      </div>{/if}
+    {#if shouldRenderVerticalTabsShell}
+      <div class="vertical-tabs-shell" data-expanded={verticalTabsExpanded}>
+        <div
+          class="vertical-tabs-controls"
+          data-expanded={verticalTabsExpanded}
+          onmouseenter={handleVerticalTabsMouseEnter}
+          onmouseleave={handleVerticalTabsMouseLeave}
+        >
+          <Button
+            class="vertical-tabs-icon-button"
+            size="sm"
+            square
+            onclick={toggleVerticalTabsBehavior}
+            title={verticalTabsBehavior === 'hover' ? 'Fixar lista de abas' : 'Ativar auto-ocultar'}
+          >
+            <Icon name={verticalTabsBehavior === 'hover' ? 'pinned-off' : 'pin'} size="0.95rem" />
+          </Button>
+
+          {#if verticalTabsBehavior === 'pinned'}
+            <Button
+              class="vertical-tabs-icon-button"
+              size="sm"
+              square
+              onclick={toggleVerticalTabsCollapsed}
+              title={verticalTabsExpanded ? 'Esconder abas' : 'Mostrar abas'}
+            >
+              <Icon name={verticalTabsExpanded ? 'close' : 'sidebar.right'} size="0.95rem" />
+            </Button>
+          {/if}
+        </div>
+
+        <div class="vertical-tabs-hover-zone" onmouseenter={handleVerticalTabsMouseEnter}></div>
+
+        {#if verticalTabsExpanded}
+          <div class="vertical-tabs-panel" onmouseleave={handleVerticalTabsMouseLeave}>
+            <TabsListWrapper orientation={$tabOrientation} />
+          </div>
+        {/if}
+      </div>
+    {/if}
 
     <div class="tab-view">
       {#if activeTabView}
@@ -692,9 +818,78 @@
     height: calc(100% - 32px);
     overflow: hidden;
   }
-
-  .vertical-tabs-container {
+  .vertical-tabs-shell {
     flex-shrink: 0;
+    display: flex;
+    align-items: stretch;
     height: 100%;
+    width: var(--vertical-tabs-width, 280px);
+    transition: width 150ms ease-out;
+    position: relative;
+    overflow: visible;
+  }
+
+  .vertical-tabs-shell[data-expanded='false'] {
+    width: 0;
+  }
+
+  .vertical-tabs-panel {
+    width: var(--vertical-tabs-width, 280px);
+    height: 100%;
+    display: flex;
+  }
+
+  .vertical-tabs-controls {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+    display: flex;
+    gap: 0.4rem;
+    z-index: 15;
+    padding: 0;
+    background: transparent;
+  }
+
+  .vertical-tabs-controls[data-expanded='false'] {
+    transform: translateX(40%);
+  }
+
+  .vertical-tabs-controls :global(.vertical-tabs-icon-button[data-button-root]) {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    background: transparent;
+    box-shadow: none;
+    opacity: 0.85;
+    transition:
+      opacity 120ms ease-out,
+      transform 120ms ease-out;
+  }
+
+  .vertical-tabs-controls :global(.vertical-tabs-icon-button[data-button-root]:hover) {
+    background: transparent;
+    opacity: 1;
+  }
+
+  .vertical-tabs-controls :global(.vertical-tabs-icon-button[data-button-root]:active) {
+    background: transparent;
+    opacity: 1;
+    transform: scale(0.95);
+  }
+
+  .vertical-tabs-hover-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -8px;
+    width: 20px;
+    z-index: 10;
+  }
+
+  .vertical-tabs-shell[data-expanded='true'] .vertical-tabs-hover-zone {
+    display: none;
   }
 </style>

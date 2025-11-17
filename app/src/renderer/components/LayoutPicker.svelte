@@ -121,7 +121,7 @@
     background-color: #eff5ff;
   }
   .radio-item input[type='radio']:checked + label {
-    outline: 4px solid rgba(59, 130, 246, 0.8);
+    outline: 4px solid rgba(255, 255, 255, 0.8);
     color: #fff;
   }
   .radio-item input[type='radio']:checked + label span {

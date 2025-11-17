@@ -388,7 +388,7 @@
     }
 
     &.danger {
-      color: light-dark(#dc2626, #f87171);
+      color: light-dark(#dc2626, #888888);
     }
   }
 

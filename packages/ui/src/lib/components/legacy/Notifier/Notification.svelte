@@ -431,8 +431,8 @@ main browser so it follows you around throughout your daily workflows.`
         @include utils.light-dark-custom('color', #fff, #fff, var(--base-color), var(--base-color));
         @include utils.light-dark-custom(
           'fill',
-          #54b1ef,
-          #54b1ef,
+          #888888,
+          #888888,
           var(--contrast-color),
           var(--contrast-color)
         );
@@ -471,8 +471,8 @@ main browser so it follows you around throughout your daily workflows.`
         &:hover {
           @include utils.light-dark-custom(
             'fill',
-            #1c92d2,
-            #1c92d2,
+            #a0a0a0,
+            #a0a0a0,
             color-mix(in srgb, var(--contrast-color), 15% #eee),
             color-mix(in srgb, var(--contrast-color), 15% #222)
           );

@@ -26,6 +26,7 @@ import type { MessagePortCallbackClient } from '@deta/services/messagePort'
 
 import { getUserConfig } from '../main/config'
 import { initBackend } from './helpers/backend'
+import { registerClaudeAgentBridge } from '../main/claudeAgent'
 import { ipcRenderer } from 'electron'
 
 import path from 'path'
@@ -182,6 +183,9 @@ const api = {
 }
 
 const { sffs, resources } = initBackend({ num_worker_threads: 4, num_processor_threads: 4 })
+
+// Register Claude Agent bridge for this renderer process
+registerClaudeAgentBridge(sffs as any)
 
 IPC_EVENTS_RENDERER.setSurfBackendHealth.on((_, state) => {
   // @ts-ignore

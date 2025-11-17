@@ -43,13 +43,13 @@
   --dark-on-unpinned-surface-horizontal: rgb(93, 93, 108);
   --dark-on-unpinned-surface-horizontal-hover: rgba(30, 34, 39, 0.9);
   --dark-on-unpinned-surface: rgba(45, 55, 69, 1);
-  --ring-color: rgba(59, 130, 246, 0.75);
-  --ring-color-muted: rgba(59, 130, 246, 0.5);
-  --ring-color-shade: rgba(59, 130, 246, 0.12);
-  --dark-on-unpinned-surface-ring: inset 0px 1.5px 0px -0.75px rgba(59, 130, 246, 0.33),
-    inset 1.5px 0px 0px -0.75px rgba(59, 130, 246, 0.33),
-    inset -1.5px 0px 0px -0.75px rgba(59, 130, 246, 0.33),
-    inset 0px -1.5px 0px -0.75px rgba(59, 130, 246, 0.33);
+  --ring-color: rgba(255, 255, 255, 0.75);
+  --ring-color-muted: rgba(255, 255, 255, 0.5);
+  --ring-color-shade: rgba(255, 255, 255, 0.12);
+  --dark-on-unpinned-surface-ring: inset 0px 1.5px 0px -0.75px rgba(255, 255, 255, 0.33),
+    inset 1.5px 0px 0px -0.75px rgba(255, 255, 255, 0.33),
+    inset -1.5px 0px 0px -0.75px rgba(255, 255, 255, 0.33),
+    inset 0px -1.5px 0px -0.75px rgba(255, 255, 255, 0.33);
 
   --sky-gray: rgba(88, 104, 132, 1);
   --sky-gray-09: rgba(88, 104, 132, 0.09);

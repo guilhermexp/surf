@@ -8,6 +8,7 @@
   import { useBrowser } from '@deta/services/browser'
   import { spawnBoxSmoke } from '@deta/ui/src/lib/components/Effects/index'
   import { ViewType } from '@deta/services/views'
+  import { translator as t } from '../../i18n'
 
   let {
     tab,
@@ -66,29 +67,29 @@
     // no-op
   }
 
-  const items = [
+  $: items = [
     {
       type: 'action',
       icon: 'reload',
-      text: 'Reload Tab',
+      text: $t('core.tabs.context.reload'),
       action: () => tab.view.webContents?.reload()
     },
     {
       type: 'action',
       icon: 'copy',
-      text: 'Copy URL',
+      text: $t('core.tabs.context.copyUrl'),
       action: () => tab.copyURL()
     },
     {
       type: 'action',
       icon: 'sidebar.right',
-      text: 'Open in Sidebar',
+      text: $t('core.tabs.context.openInSidebar'),
       action: () => browser.moveTabToSidebar(tab)
     },
     {
       type: 'action',
       icon: 'close',
-      text: 'Close Tab',
+      text: $t('core.tabs.context.close'),
       action: () => closeTab(true)
     }
   ] satisfies CtxItem[]
@@ -204,7 +205,7 @@
         color(display-p3 0.9686 0.9843 1 / 0.93) 100%
       );
       box-shadow:
-        0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+        0 -0.5px 1px 0 rgba(255, 255, 255, 0.15) inset,
         0 1px 1px 0 #fff inset,
         0 2px 8px 0 rgba(62, 71, 80, 0.1),
         0 1px 3px 0 rgba(62, 71, 80, 0.1);

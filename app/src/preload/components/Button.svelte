@@ -66,19 +66,19 @@
     }
 
     &.secondary {
-      color: #fd1bdf;
+      color: #888888;
     }
 
     &.primary {
-      background: #ff4eed;
+      background: #888888;
       color: #fff;
 
       &:hover {
-        background: #fd1bdf;
+        background: #a0a0a0;
       }
 
       &:active {
-        background: #fd1bdf;
+        background: #707070;
       }
     }
   }

@@ -152,22 +152,19 @@ export const ResourceViewerEntryPoint = (() => {
 })()
 
 export const OverlayEntryPoint = (() => {
-  return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Overlay', 'overlay.html')}`
   if (import.meta.env.DEV && process.env.ELECTRON_RENDERER_URL) {
     return `${process.env.ELECTRON_RENDERER_URL}/Overlay/overlay.html`
-  } else {
-    return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Overlay', 'overlay.html')}`
   }
+
+  return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Overlay', 'overlay.html')}`
 })()
 
 export const CoreEntryPoint = (() => {
-  return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Core', 'core.html')}`
-
   if (import.meta.env.DEV && process.env.ELECTRON_RENDERER_URL) {
-    return `${process.env.ELECTRON_RENDERER_URL}/Overlay/overlay.html`
-  } else {
-    return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Overlay', 'overlay.html')}`
+    return `${process.env.ELECTRON_RENDERER_URL}/Core/core.html`
   }
+
+  return `file://${path.join(app.getAppPath(), 'out', 'renderer', 'Core', 'core.html')}`
 })()
 
 export function checkIfSurfProtocolUrl(url: string): boolean {

@@ -3,25 +3,33 @@ pub mod tokens;
 use reqwest::{blocking::Response, header};
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::VecDeque,
     io::{BufRead, BufReader},
     time::{Duration, Instant},
 };
 
 use crate::{
+    ai::claude_agent::ClaudeAgentRuntime,
     ai::llm::models::{Message, MessageContent, MessageRole},
     BackendError, BackendResult,
 };
 
 pub struct ChatCompletionStream {
-    reader: BufReader<Response>,
+    reader: StreamReader,
     buffer: String,
     provider: Provider,
     last_update: Instant,
     update_interval: Duration,
 }
 
+enum StreamReader {
+    Http(BufReader<Response>),
+    Custom(VecDeque<BackendResult<String>>),
+}
+
 pub struct LLMClient {
     client: reqwest::blocking::Client,
+    claude_agent_runtime: Option<ClaudeAgentRuntime>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -30,6 +38,7 @@ pub enum Provider {
     OpenAI,
     Anthropic,
     Google,
+    ClaudeAgent,
     Custom(String),
 }
 
@@ -61,6 +70,12 @@ pub enum Model {
     Claude35Sonnet,
     #[serde(rename = "claude-3-5-haiku-latest")]
     Claude35Haiku,
+    #[serde(rename = "claude-code-agent")]
+    ClaudeCodeAgent,
+    #[serde(rename = "claude-sonnet-4-5-20250929")]
+    ClaudeCodeAgentSonnet45,
+    #[serde(rename = "claude-haiku-4-5-20251001")]
+    ClaudeCodeAgentHaiku45,
 
     #[serde(rename = "gemini-2.0-flash")]
     Gemini20Flash,
@@ -205,11 +220,23 @@ fn truncate_messages(messages: Vec<Message>, model: &Model) -> Vec<Message> {
 impl ChatCompletionStream {
     fn new(reader: BufReader<Response>, provider: Provider, packets_per_second: u32) -> Self {
         Self {
-            reader,
+            reader: StreamReader::Http(reader),
             buffer: String::new(),
             provider,
             last_update: Instant::now(),
             update_interval: Duration::from_secs_f64(1.0 / packets_per_second as f64),
+        }
+    }
+
+    fn from_single_chunk(chunk: BackendResult<String>, provider: Provider) -> Self {
+        let mut queue = VecDeque::new();
+        queue.push_back(chunk);
+        Self {
+            reader: StreamReader::Custom(queue),
+            buffer: String::new(),
+            provider,
+            last_update: Instant::now(),
+            update_interval: Duration::from_secs(0),
         }
     }
 
@@ -244,6 +271,7 @@ impl Provider {
                 "{}/v1/messages",
                 base_url.unwrap_or("https://api.anthropic.com".to_string())
             ),
+            Self::ClaudeAgent => String::new(),
             Self::Custom(url) => url.to_string(),
         }
     }
@@ -257,6 +285,7 @@ impl Provider {
                     ("Authorization".to_string(), format!("Bearer {}", api_key))
                 }
                 Self::Anthropic => ("x-api-key".to_string(), api_key.to_string()),
+                Self::ClaudeAgent => ("Authorization".to_string(), api_key.to_string()),
             };
             headers.push(auth);
         }
@@ -276,6 +305,11 @@ impl Provider {
     ) -> BackendResult<(String, Vec<(String, String)>)> {
         let (completions_url, api_key) = match (self, custom_key) {
             (Self::Custom(_), api_key) => (self.get_completion_url(None), api_key),
+            (Self::ClaudeAgent, _) => {
+                return Err(BackendError::GenericError(
+                    "Claude Code Agent requests are handled via the local bridge".to_string(),
+                ))
+            }
             (_, Some(api_key)) => (self.get_completion_url(None), Some(api_key)),
             (_, None) => return Err(BackendError::LLMClientErrorAPIKeyMissing),
         };
@@ -308,6 +342,9 @@ impl Provider {
                 &self.add_response_format_if_needed(messages.to_vec(), response_format),
                 response_format,
             ),
+            Self::ClaudeAgent => Err(BackendError::GenericError(
+                "Claude Code Agent requests are handled via the local bridge".to_string(),
+            )),
         }
     }
 
@@ -465,6 +502,9 @@ impl Provider {
                     BackendError::GenericError(format!("failed to parse anthropic response: {e}"))
                 })
                 .map(|chunk| chunk.delta.and_then(|d| d.text)),
+            Self::ClaudeAgent => Err(BackendError::GenericError(
+                "Claude Code Agent streaming is handled locally".to_string(),
+            )),
         }
     }
 
@@ -490,6 +530,9 @@ impl Provider {
                     }
                 }
             }
+            Self::ClaudeAgent => Err(BackendError::GenericError(
+                "Claude Code Agent responses are handled locally".to_string(),
+            )),
         }
     }
 }
@@ -519,6 +562,9 @@ impl Model {
             Self::Claude37Sonnet => "claude-3-7-sonnet-latest",
             Self::Claude35Sonnet => "claude-3-5-sonnet-latest",
             Self::Claude35Haiku => "claude-3-5-haiku-latest",
+            Self::ClaudeCodeAgent => "claude-code-agent",
+            Self::ClaudeCodeAgentSonnet45 => "claude-sonnet-4-5-20250929",
+            Self::ClaudeCodeAgentHaiku45 => "claude-haiku-4-5-20251001",
             Self::Gemini20Flash => "gemini-2.0-flash",
             Self::Custom { name, .. } => name,
         }
@@ -539,6 +585,9 @@ impl Model {
             | Self::Claude37Sonnet
             | Self::Claude35Sonnet
             | Self::Claude35Haiku => &Provider::Anthropic,
+            Self::ClaudeCodeAgent
+            | Self::ClaudeCodeAgentSonnet45
+            | Self::ClaudeCodeAgentHaiku45 => &Provider::ClaudeAgent,
             Self::Gemini20Flash => &Provider::Google,
             Self::Custom { provider, .. } => provider,
         }
@@ -560,7 +609,10 @@ impl TokenModel for Model {
             | Self::Claude4Sonnet
             | Self::Claude37Sonnet
             | Self::Claude35Sonnet
-            | Self::Claude35Haiku => 200_000,
+            | Self::Claude35Haiku
+            | Self::ClaudeCodeAgent
+            | Self::ClaudeCodeAgentSonnet45
+            | Self::ClaudeCodeAgentHaiku45 => 200_000,
             // NOTE: actual is 1M for gemini-2.0-flash
             Self::Gemini20Flash => 900_000,
             Self::Custom { max_tokens, .. } => *max_tokens,
@@ -572,32 +624,37 @@ impl Iterator for ChatCompletionStream {
     type Item = BackendResult<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.buffer.clear();
+        match &mut self.reader {
+            StreamReader::Custom(queue) => queue.pop_front(),
+            StreamReader::Http(reader) => {
+                self.buffer.clear();
 
-        match self.reader.read_line(&mut self.buffer) {
-            Ok(0) => None,
-            Ok(_) => {
-                self.buffer = self.buffer.trim().to_string();
-                if self.buffer.is_empty() {
-                    return self.next();
-                }
+                match reader.read_line(&mut self.buffer) {
+                    Ok(0) => None,
+                    Ok(_) => {
+                        self.buffer = self.buffer.trim().to_string();
+                        if self.buffer.is_empty() {
+                            return self.next();
+                        }
 
-                let data = match self.buffer.strip_prefix("data: ") {
-                    None => return self.next(),
-                    Some("[DONE]") => return None,
-                    Some(data) => data,
-                };
+                        let data = match self.buffer.strip_prefix("data: ") {
+                            None => return self.next(),
+                            Some("[DONE]") => return None,
+                            Some(data) => data,
+                        };
 
-                match self.provider.parse_response_chunk(data, true).transpose() {
-                    Some(Ok(content)) => {
-                        self.wait_for_next_update();
-                        Some(Ok(content))
+                        match self.provider.parse_response_chunk(data, true).transpose() {
+                            Some(Ok(content)) => {
+                                self.wait_for_next_update();
+                                Some(Ok(content))
+                            }
+                            Some(Err(e)) => Some(Err(e)),
+                            None => self.next(),
+                        }
                     }
-                    Some(Err(e)) => Some(Err(e)),
-                    None => self.next(),
+                    Err(e) => Some(Err(BackendError::GenericError(e.to_string()))),
                 }
             }
-            Err(e) => Some(Err(BackendError::GenericError(e.to_string()))),
         }
     }
 }
@@ -608,7 +665,16 @@ impl LLMClient {
             client: reqwest::blocking::Client::builder()
                 .timeout(std::time::Duration::from_secs(300))
                 .build()?,
+            claude_agent_runtime: None,
         })
+    }
+
+    pub fn set_claude_agent_runtime(&mut self, runtime: Option<ClaudeAgentRuntime>) {
+        match &runtime {
+            Some(_) => tracing::info!("[LLM Client] ✅ Claude Agent runtime set successfully"),
+            None => tracing::warn!("[LLM Client] ⚠️  Claude Agent runtime set to None"),
+        }
+        self.claude_agent_runtime = runtime;
     }
 
     #[tracing::instrument(level = "trace", skip(self, messages, response_format))]
@@ -619,9 +685,26 @@ impl LLMClient {
         custom_key: Option<String>,
         response_format: Option<serde_json::Value>,
     ) -> BackendResult<String> {
+        tracing::info!(
+            "[LLM Client] create_chat_completion called with model: {:?}",
+            model
+        );
+        let normalized_messages =
+            truncate_messages(filter_unsupported_content(messages, model), model);
         let provider = model.provider();
+        tracing::info!("[LLM Client] Provider detected: {:?}", provider);
+        if matches!(provider, Provider::ClaudeAgent) {
+            tracing::info!("[LLM Client] ✅ Claude Agent provider detected - routing to run_claude_agent_completion");
+            tracing::info!(
+                "[LLM Client] Messages count: {}, Has custom key: {}",
+                normalized_messages.len(),
+                custom_key.is_some()
+            );
+            return self.run_claude_agent_completion(normalized_messages, model, custom_key);
+        }
+
         let response = self.send_completion_request(
-            messages,
+            normalized_messages,
             model,
             custom_key,
             response_format.as_ref(),
@@ -639,8 +722,32 @@ impl LLMClient {
         custom_key: Option<String>,
         response_format: Option<serde_json::Value>,
     ) -> BackendResult<ChatCompletionStream> {
+        tracing::info!(
+            "[LLM Client] create_streaming_chat_completion called with model: {:?}",
+            model
+        );
+        let normalized_messages =
+            truncate_messages(filter_unsupported_content(messages, model), model);
+        if matches!(model.provider(), Provider::ClaudeAgent) {
+            tracing::info!("[LLM Client] ✅ Claude Agent provider detected in streaming - routing to run_claude_agent_completion");
+            tracing::info!(
+                "[LLM Client] Messages count: {}, Has custom key: {}",
+                normalized_messages.len(),
+                custom_key.is_some()
+            );
+            let output =
+                self.run_claude_agent_completion(normalized_messages, model, custom_key)?;
+            tracing::info!(
+                "[LLM Client] Got output from Claude Agent, creating single chunk stream"
+            );
+            return Ok(ChatCompletionStream::from_single_chunk(
+                Ok(output),
+                Provider::ClaudeAgent,
+            ));
+        }
+
         let response = self.send_completion_request(
-            messages,
+            normalized_messages,
             model,
             custom_key,
             response_format.as_ref(),
@@ -658,7 +765,6 @@ impl LLMClient {
         response_format: Option<&serde_json::Value>,
         stream: bool,
     ) -> BackendResult<Response> {
-        let messages = truncate_messages(filter_unsupported_content(messages, model), model);
         let provider = model.provider();
         let (url, headers) = provider.get_request_params(custom_key)?;
         let body = provider.prepare_completion_request(
@@ -738,5 +844,52 @@ impl LLMClient {
             provider.clone(),
             120,
         ))
+    }
+
+    fn run_claude_agent_completion(
+        &self,
+        messages: Vec<Message>,
+        model: &Model,
+        custom_key: Option<String>,
+    ) -> BackendResult<String> {
+        tracing::info!("[LLM Client] run_claude_agent_completion started");
+        tracing::info!("[LLM Client] Model: {:?}", model);
+        tracing::info!("[LLM Client] Messages: {}", messages.len());
+
+        let runtime = self.claude_agent_runtime.as_ref().ok_or_else(|| {
+            tracing::error!("[LLM Client] ❌ Claude Code Agent runtime is not available!");
+            tracing::error!("[LLM Client] Runtime was never set or failed to initialize");
+            BackendError::GenericError("Claude Code Agent runtime is not available".to_string())
+        })?;
+
+        tracing::info!("[LLM Client] ✅ Runtime is available");
+
+        // Extract model name from Model enum
+        let model_name = match model {
+            Model::ClaudeCodeAgent => None, // Let SDK choose
+            Model::ClaudeCodeAgentSonnet45 => Some("claude-sonnet-4-5-20250929".to_string()),
+            Model::ClaudeCodeAgentHaiku45 => Some("claude-haiku-4-5-20251001".to_string()),
+            _ => None,
+        };
+
+        tracing::info!("[LLM Client] Model name for SDK: {:?}", model_name);
+        tracing::info!("[LLM Client] Building request and delegating to runtime...");
+
+        let request = runtime.build_request(messages, custom_key, model_name);
+        let result = runtime.run_completion(request);
+
+        match &result {
+            Ok(output) => {
+                tracing::info!(
+                    "[LLM Client] ✅ Claude Agent completion successful, output length: {}",
+                    output.len()
+                );
+            }
+            Err(err) => {
+                tracing::error!("[LLM Client] ❌ Claude Agent completion failed: {}", err);
+            }
+        }
+
+        result
     }
 }

@@ -7,6 +7,7 @@
   import { getCleanHostname } from '@deta/utils'
   import { useBrowser } from '@deta/services/browser'
   import { ViewType } from '@deta/services/views'
+  import { translator as t } from '../../i18n'
 
   let {
     tab,
@@ -145,7 +146,7 @@
   </div>
 
   {#if !collapsed && !squished && !tab.pinned}
-    <span class="tab-title typo-tab-title">{$title || hostname || 'Untitled'}</span>
+    <span class="tab-title typo-tab-title">{$title || hostname || $t('core.tabs.untitled')}</span>
   {/if}
 
   {#if showCloseButton && !collapsed && !squished && !tab.pinned}

@@ -15,6 +15,7 @@
   import ResourceMenu from './ResourceMenu.svelte'
   import { ResourceTypes } from '@deta/types'
   import type { TabItem } from '@deta/services/tabs'
+  import { translator as t } from '../../i18n'
 
   let {
     view,
@@ -249,7 +250,7 @@
         style="padding-block: 6px;padding-inline: 8px;"
       >
         <Icon name="note" size="1.3rem" />
-        <span>Ask</span>
+        <span>{$t('core.navigation.askButton')}</span>
       </Button>
     {/if}
   </NavigationBarGroup>
@@ -276,38 +277,14 @@
     padding: 0.3rem 0.75rem;
     padding-left: 0.35rem;
     padding-right: 0.35rem;
-    background: light-dark(var(--app-background), var(--app-background-dark));
     color: light-dark(var(--on-app-background), var(--on-app-background-dark));
-
-    background: light-dark(#fff, #101010);
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-
-    //border-top: 1px solid var(--border-color);
-    //border-left: 1px solid var(--border-color);
-    //border-right: 1px solid var(--border-color);
     margin-inline: 0px;
 
-    //&.roundRightCorner {
-    //  border-top-right-radius: 1rem;
-    //}
-    //&.roundLeftCorner {
-    //  border-top-left-radius: 1rem;
-    //}
-
-    border: 0.5px solid light-dark(#fff, rgba(71, 85, 105, 0.3));
-    background: radial-gradient(
-      290.88% 100% at 50% 0%,
-      light-dark(rgb(237 243 247 / 96%), rgba(26, 26, 26, 0.92)) 0%,
-      light-dark(rgba(255, 255, 255, 1), rgba(16, 16, 16, 1)) 100%
-    );
-
-    box-shadow:
-      0 -0.5px 1px 0 light-dark(#ffffff1f, rgba(71, 85, 105, 0.12)) inset,
-      0 1px 1px 0 light-dark(#fff, rgba(71, 85, 105, 0.2)) inset,
-      0 -3px 1px 0 light-dark(rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.15)),
-      0 -2px 1px 0 light-dark(rgba(9, 10, 11, 0.01), rgba(0, 0, 0, 0.08)),
-      0 -1px 1px 0 light-dark(rgba(9, 10, 11, 0.03), rgba(0, 0, 0, 0.12));
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 
     display: flex;
     gap: 0.5rem;
@@ -317,18 +294,8 @@
     transition: background 123ms ease-out;
 
     &.grey {
-      background: radial-gradient(
-        290.88% 100% at 50% 0%,
-        light-dark(rgb(237 243 247 / 96%), rgba(26, 26, 26, 0.92)) 0%,
-        light-dark(rgba(250, 250, 250, 1), rgba(16, 16, 16, 1)) 100%
-      );
-
-      box-shadow:
-        0 -0.5px 1px 0 light-dark(rgba(250, 250, 250, 1), rgba(71, 85, 105, 0.2)) inset,
-        0 0px 1px 0 light-dark(#fff, rgba(71, 85, 105, 0.15)) inset,
-        0 -3px 1px 0 light-dark(rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.15)),
-        0 -2px 1px 0 light-dark(rgba(9, 10, 11, 0.01), rgba(0, 0, 0, 0.08)),
-        0 -1px 1px 0 light-dark(rgba(9, 10, 11, 0.03), rgba(0, 0, 0, 0.12));
+      background: transparent;
+      box-shadow: none;
     }
 
     .group {

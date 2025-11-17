@@ -1,6 +1,7 @@
 <script lang="ts">
   import SettingsOption from './SettingsOption.svelte'
   import type { UserSettings } from '@deta/types'
+  import { translator as t } from '../../Core/i18n'
 
   export let userConfigSettings: UserSettings
 
@@ -9,8 +10,8 @@
 
 <SettingsOption
   icon="link"
-  title="Linked Contexts"
-  description="Link contexts to each other to easily navigate between them."
+  title={$t('settings.contextLinking.title')}
+  description={$t('settings.contextLinking.description')}
   bind:value={userConfigSettings.experimental_context_linking}
   on:update
 >
@@ -23,7 +24,7 @@
       </div>
 
       <Switch
-        color="#ff4eed"
+        color="#ffffff"
         bind:checked={userConfigSettings.experimental_context_linking_sidebar}
         on:update
       />

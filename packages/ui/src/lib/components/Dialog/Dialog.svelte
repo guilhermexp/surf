@@ -288,7 +288,7 @@ again, as always and this doesnt actually happen. -->
         color: light-dark(#ffffff, var(--on-app-background-dark, #e5edff));
       }
       .danger {
-        --background: light-dark(#ff4d4f, var(--danger-dark, #f87171));
+        --background: light-dark(#888888, var(--danger-dark, #888888));
         color: light-dark(#ffffff, var(--on-app-background-dark, #e5edff));
       }
       .muted {

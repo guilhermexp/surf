@@ -1,0 +1,242 @@
+{
+  "app": {
+    "name": "Surf",
+    "shell": {
+      "navigation": {
+        "back": "Voltar",
+        "forward": "Avançar",
+        "refresh": "Recarregar",
+        "home": "Início",
+        "searchPlaceholder": "Pesquise ou digite um endereço",
+        "openSettings": "Configurações"
+      },
+      "tabs": {
+        "newTab": "Nova aba",
+        "closeTab": "Fechar aba",
+        "reopenTab": "Reabrir aba",
+        "toggleSidebar": "Alternar barra lateral"
+      },
+      "menu": {
+        "file": "Arquivo",
+        "edit": "Editar",
+        "view": "Exibir",
+        "history": "Histórico",
+        "window": "Janela",
+        "help": "Ajuda"
+      }
+    }
+  },
+  "settings": {
+    "tabs": {
+      "general": "Geral",
+      "ai": "IA",
+      "appearance": "Aparência"
+    },
+    "general": {
+      "heading": "Geral",
+      "dev": {
+        "migration": "Migração",
+        "runMigration": "Executar migração",
+        "completed": "Migração concluída!"
+      },
+      "help": {
+        "title": "Compartilhe seu e-mail conosco",
+        "message": "Ao aceitar você compartilhará seu e-mail conosco e poderemos contatar você com base no uso do Surf. Nada de spam, prometemos.<br><br>(O Surf será reiniciado após aceitar.)",
+        "accept": "Aceitar"
+      },
+      "language": {
+        "label": "Idioma",
+        "description": "Escolha o idioma usado em todo o Surf.",
+        "options": {
+          "en": "Inglês",
+          "pt": "Português"
+        }
+      },
+      "darkMode": {
+        "title": "Modo escuro",
+        "description": "Ative a aparência escura do aplicativo."
+      },
+      "searchEngine": {
+        "title": "Motor de busca padrão"
+      },
+      "licenses": {
+        "title": "Licenças e avisos de código aberto"
+      },
+      "misc": {
+        "title": "Diversos"
+      }
+    },
+    "teletype": {
+      "title": "Ação padrão do TeleType",
+      "description": "Escolha como a barra de comando seleciona ações por padrão.",
+      "options": {
+        "auto": {
+          "label": "Automático (inteligente)",
+          "description": "Seleciona automaticamente com base no tipo de solicitação."
+        },
+        "ask": {
+          "label": "Sempre perguntar ao Surf",
+          "description": "Sempre usa a ação Perguntar ao Surf."
+        },
+        "search": {
+          "label": "Sempre pesquisar na web",
+          "description": "Sempre usa a ação Pesquisar na web."
+        }
+      }
+    },
+    "smartNotes": {
+      "title": "Surf Notes",
+      "description": "Acesse recursos de IA do Surf dentro das notas, como autocompletar e citações.",
+      "moreInfo": "Mais informações",
+      "sidebar": {
+        "title": "Barra lateral de notas",
+        "description": "Crie e visualize notas do Surf na barra lateral, substituindo o chat antigo."
+      },
+      "dialog": {
+        "enableTitle": "Ativar barra lateral de notas",
+        "disableTitle": "Desativar barra lateral de notas",
+        "enableMessage": "O Surf precisa reiniciar para ativar a barra lateral experimental.",
+        "disableMessage": "O Surf precisa reiniciar para voltar ao chat lateral.",
+        "enableAction": "Ativar e reiniciar",
+        "disableAction": "Desativar e reiniciar"
+      },
+      "chatInput": {
+        "title": "Entrada de chat na barra lateral (experimental)",
+        "description": "Mostra uma entrada de chat tradicional na barra lateral."
+      }
+    },
+    "contextLinking": {
+      "title": "Contextos vinculados",
+      "description": "Vincule contextos para navegar facilmente entre eles."
+    },
+    "appearance": {
+      "light": "Claro",
+      "dark": "Escuro"
+    },
+    "modelSettings": {
+      "activeModel": {
+        "title": "Modelo ativo",
+        "select": "Selecionar modelo",
+        "description": "O modelo selecionado é usado em todo o Surf. Podemos alternar para opções mais eficientes do mesmo provedor em alguns recursos."
+      },
+      "configure": {
+        "title": "Configurar modelos",
+        "description": "Forneça uma chave de API para provedores integrados ou adicione seus próprios modelos.",
+        "manual": "manual"
+      },
+      "status": {
+        "apiKeyUpdated": "Chave de API de {provider} atualizada com sucesso.",
+        "apiKeyCleared": "Chave de API de {provider} removida."
+      },
+      "fields": {
+        "apiKey": "Chave de API",
+        "apiKeyPlaceholder": "Sua chave de API",
+        "optionalApiKeyPlaceholder": "Chave de API opcional",
+        "apiKeyExample": "sk-ant-api03-...",
+        "apiEndpoint": "Endpoint de API"
+      },
+      "modelListTitle": "Modelos disponíveis:",
+      "actions": {
+        "getKey": "Obter chave",
+        "viewList": "Ver lista"
+      },
+      "claude": {
+        "description": "usa o SDK oficial do Claude com acesso ao sistema de arquivos. Escolha um modelo específico (Sonnet 4.5 ou Haiku 4.5) ou use “Automático”.",
+        "recommendedLabel": "Recomendado:",
+        "recommendation": "Claude Code Agent Haiku 4.5 para respostas mais rápidas e menor custo."
+      },
+      "customModels": {
+        "title": "Modelos personalizados",
+        "customLabel": "Personalizado",
+        "add": "Adicionar modelo",
+        "empty": "Nenhum modelo personalizado configurado. Adicione um para começar.",
+        "fields": {
+          "label": "Nome do modelo",
+          "labelPlaceholder": "Meu modelo personalizado",
+          "labelHelp": "Dê um nome para identificar o modelo na interface do Surf.",
+          "modelId": "ID do modelo",
+          "providerModelId": "ID do modelo do provedor",
+          "providerModelHelp": "O identificador usado pela API do provedor.",
+          "endpoint": "Endpoint da API",
+          "endpointHelp": "URL completa compatível com a API do OpenAI.",
+          "contextSize": "Tamanho do contexto (tokens)",
+          "contextSizeHelp": "Número máximo de tokens suportado.",
+          "supportsVision": "Suporta visão",
+          "supportsVisionHelp": "Indica se o modelo possui recursos de visão.",
+          "supportsJson": "Suporta formato JSON",
+          "supportsJsonHelp": "Indica se o modelo retorna resultados em JSON."
+        }
+      },
+      "delete": {
+        "title": "Excluir <i>{model}</i>",
+        "message": "Esta ação não pode ser desfeita."
+      }
+    }
+  },
+  "core": {
+    "sidebar": {
+      "status": {
+        "open": "Barra lateral aberta"
+      },
+      "actions": {
+        "show": "Mostrar barra lateral",
+        "pin": "Fixar barra lateral",
+        "autoHide": "Ativar ocultar automático"
+      }
+    },
+    "navigation": {
+      "askButton": "Perguntar"
+    },
+    "locationBar": {
+      "appName": "Surf",
+      "notebook": "Bloco",
+      "resource": "Recurso"
+    },
+    "downloads": {
+      "completed": "Download concluído"
+    },
+    "saveState": {
+      "add": "Adicionar ao Surf",
+      "added": "Adicionado ao Surf!",
+      "searchNotebooks": "Pesquise blocos para adicionar..."
+    },
+    "tabs": {
+      "context": {
+        "reload": "Recarregar aba",
+        "copyUrl": "Copiar URL",
+        "openInSidebar": "Abrir na barra lateral",
+        "close": "Fechar aba"
+      },
+      "untitled": "Sem título"
+    }
+  },
+  "dialogs": {
+    "confirm": {
+      "title": "Tem certeza?",
+      "message": "Esta ação não pode ser desfeita."
+    },
+    "languageSaved": {
+      "title": "Idioma atualizado",
+      "message": "Sua preferência de idioma foi salva."
+    }
+  },
+  "common": {
+    "actions": {
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "close": "Fechar",
+      "save": "Salvar",
+      "delete": "Excluir"
+    },
+    "labels": {
+      "optional": "opcional"
+    },
+    "usage": {
+      "used": "usados",
+      "remaining": "restantes"
+    },
+    "status": {
+      "loading": "Carregando..."
+    }
+  }
+}

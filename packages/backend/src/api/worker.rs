@@ -13,6 +13,10 @@ pub fn register_exported_functions(cx: &mut ModuleContext) -> NeonResult<()> {
         "js__backend_set_surf_backend_health",
         js_set_surf_backend_health,
     )?;
+    cx.export_function(
+        "js__claude_agent_register_runner",
+        js_register_claude_agent_runner,
+    )?;
     Ok(())
 }
 
@@ -93,4 +97,11 @@ fn js_run_migration(mut cx: FunctionContext) -> JsResult<JsPromise> {
         deferred,
     );
     Ok(promise)
+}
+
+fn js_register_claude_agent_runner(mut cx: FunctionContext) -> JsResult<JsUndefined> {
+    let tunnel = cx.argument::<JsBox<tunnel::WorkerTunnel>>(0)?;
+    let runner = cx.argument::<JsFunction>(1)?.root(&mut cx);
+    tunnel.register_claude_agent_runner(runner);
+    Ok(cx.undefined())
 }

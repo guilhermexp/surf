@@ -84,7 +84,7 @@
     background: light-dark(
       radial-gradient(
         290.88% 100% at 50% 0%,
-        var(--tab-active-gradient-top, rgba(219, 237, 255, 0.96)) 0%,
+        var(--tab-active-gradient-top, rgba(237, 246, 255, 0.96)) 0%,
         var(--tab-active-gradient-bottom, rgba(246, 251, 255, 0.93)) 100%
       ),
       radial-gradient(
@@ -106,7 +106,7 @@
       )
     );
     box-shadow:
-      0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+      0 -0.5px 1px 0 rgba(255, 255, 255, 0.15) inset,
       0 1px 1px 0 light-dark(#fff, rgba(255, 255, 255, 0.05)) inset,
       0 12px 5px 0 #3e4750,
       0 7px 4px 0 rgba(62, 71, 80, 0.01),
@@ -117,7 +117,7 @@
       0 1px 1px 0 rgba(0, 0, 0, 0.05),
       0 0 1px 0 rgba(0, 0, 0, 0.09);
     box-shadow:
-      0 -0.5px 1px 0 color(display-p3 0.5294 0.7333 0.9961 / 0.15) inset,
+      0 -0.5px 1px 0 color(display-p3 1 1 1 / 0.15) inset,
       0 1px 1px 0 light-dark(color(display-p3 1 1 1), color(display-p3 1 1 1 / 0.05)) inset,
       0 12px 5px 0 color(display-p3 0.251 0.2784 0.3098 / 0),
       0 7px 4px 0 color(display-p3 0.251 0.2784 0.3098 / 0.01),
@@ -144,7 +144,7 @@
         background: light-dark(
           radial-gradient(
             290.88% 100% at 50% 0%,
-            var(--tab-active-gradient-top, rgba(219, 237, 255, 0.96)) 0%,
+            var(--tab-active-gradient-top, rgba(237, 246, 255, 0.96)) 0%,
             var(--tab-active-gradient-bottom, rgba(246, 251, 255, 0.93)) 100%
           ),
           radial-gradient(
@@ -196,7 +196,7 @@
         background: light-dark(
           radial-gradient(
             290.88% 100% at 50% 0%,
-            var(--tab-active-gradient-top, rgba(219, 237, 255, 0.96)) 0%,
+            var(--tab-active-gradient-top, rgba(237, 246, 255, 0.96)) 0%,
             var(--tab-active-gradient-bottom, rgba(246, 251, 255, 0.93)) 100%
           ),
           radial-gradient(

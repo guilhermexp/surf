@@ -235,13 +235,13 @@
     height: 40px;
     opacity: 1;
     background: light-dark(
-      rgba(var(--accent-color-rgb, 0, 122, 204), 0.1),
-      rgba(var(--accent-color-rgb, 129, 146, 255), 0.15)
+      rgba(var(--accent-color-rgb, 143, 143, 143), 0.1),
+      rgba(var(--accent-color-rgb, 255, 255, 255), 0.15)
     );
     border: 1px dashed
       light-dark(
-        rgba(var(--accent-color-rgb, 0, 122, 204), 0.3),
-        rgba(var(--accent-color-rgb, 129, 146, 255), 0.4)
+        rgba(var(--accent-color-rgb, 143, 143, 143), 0.3),
+        rgba(var(--accent-color-rgb, 255, 255, 255), 0.4)
       );
   }
 
@@ -259,12 +259,12 @@
   /* Enhanced visual feedback when hovering over pin zone */
   .pin-zone-hint[data-drag-target='true'] {
     background: light-dark(
-      rgba(var(--accent-color-rgb, 0, 122, 204), 0.2),
-      rgba(var(--accent-color-rgb, 129, 146, 255), 0.25)
+      rgba(var(--accent-color-rgb, 143, 143, 143), 0.2),
+      rgba(var(--accent-color-rgb, 255, 255, 255), 0.25)
     ) !important;
     border-color: light-dark(
-      rgba(var(--accent-color-rgb, 0, 122, 204), 0.5),
-      rgba(var(--accent-color-rgb, 129, 146, 255), 0.6)
+      rgba(var(--accent-color-rgb, 143, 143, 143), 0.5),
+      rgba(var(--accent-color-rgb, 255, 255, 255), 0.6)
     ) !important;
     border-style: solid !important;
   }

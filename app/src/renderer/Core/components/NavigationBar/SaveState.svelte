@@ -8,6 +8,7 @@
   import { useResourceManager, type Resource } from '@deta/services/resources'
   import { writable } from 'svelte/store'
   import { ResourceTypes, SpaceEntryOrigin, type Fn } from '@deta/types'
+  import { translator as t } from '../../i18n'
 
   let {
     view
@@ -161,13 +162,13 @@
         {:else if resource.type !== ResourceTypes.DOCUMENT_SPACE_NOTE}
           <button class="list-item save-to-surf" disabled>
             <Icon name="check" size="19px" color="rgb(6, 158, 54)" />
-            <div class="list-item-label">Added to Surf!</div>
+            <div class="list-item-label">{$t('core.saveState.added')}</div>
           </button>
         {/if}
       {:else}
         <button class="list-item save-to-surf" onclick={saveToSurf}>
           <Icon name="save" />
-          <div class="list-item-label">Add to Surf</div>
+          <div class="list-item-label">{$t('core.saveState.add')}</div>
         </button>
       {/if}
     </div>
@@ -182,7 +183,7 @@
         bind:this={searchableList}
         bind:value={searchValue}
         items={notebookItems}
-        searchPlaceholder="Search notebooks to add to..."
+        searchPlaceholder={$t('core.saveState.searchNotebooks')}
         autofocus={true}
       >
         {#snippet itemRenderer(item)}

@@ -23,7 +23,7 @@
   );
 
   --ctx-item-hover: light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.08));
-  --ctx-item-danger-hover: light-dark(#ff4d4f, var(--danger-dark, #f87171));
+  --ctx-item-danger-hover: light-dark(#888888, var(--danger-dark, #888888));
   --ctx-item-submenu-open: light-dark(rgba(0, 0, 0, 0.065), rgba(255, 255, 255, 0.12));
   --ctx-item-text: light-dark(#210e1f, var(--on-surface-dark, #cbd5f5));
   --ctx-item-text-hover: light-dark(#000, var(--on-app-background-dark, #e5edff));

@@ -37,6 +37,7 @@
   import { generateID, truncate } from '@deta/utils'
   import { createEventDispatcher, onMount } from 'svelte'
   import { Button, Dropdown, type DropdownItem, openDialog } from '@deta/ui'
+  import { translator as t } from '../../Core/i18n'
 
   export let selectedModelId: Writable<string>
   export let models: Writable<Model[]>
@@ -51,10 +52,17 @@
 
   const modelSelectorOpen = writable(false)
 
+  type CustomModelDefinition =
+    (typeof CUSTOM_MODEL_DEFINITIONS)[keyof typeof CUSTOM_MODEL_DEFINITIONS]
+
+  const isCustomApiKeyOptional = (definition?: CustomModelDefinition) =>
+    Boolean(definition && !definition.api_key_page)
+
   // Provider-level API keys
   let openAIApiKey = ''
   let anthropicApiKey = ''
   let googleApiKey = ''
+  let claudeAgentApiKey = ''
 
   let isUpdatingKeys = false
 
@@ -86,9 +94,9 @@
     // Show feedback to user
     const providerName = ProviderLabels[provider]
     if (apiKey) {
-      showStatus(`${providerName} API key updated successfully`)
+      showStatus($t('settings.modelSettings.status.apiKeyUpdated', { provider: providerName }))
     } else {
-      showStatus(`${providerName} API key cleared`)
+      showStatus($t('settings.modelSettings.status.apiKeyCleared', { provider: providerName }))
     }
 
     // Reset flag after a short delay to allow store updates to complete
@@ -167,7 +175,7 @@
     if (type === 'custom') {
       newCustomModel = {
         ...newCustomModel,
-        label: 'Custom',
+        label: $t('settings.modelSettings.customModels.customLabel'),
         icon: 'sparkles',
         custom_model_name: '',
         provider_url: ''
@@ -192,11 +200,11 @@
 
     const { closeType: confirmed } = await openDialog({
       icon: 'trash',
-      title: `Delete <i>${truncate(model.label, 26)}</i>`,
-      message: `This can't be undone.`,
+      title: $t('settings.modelSettings.delete.title', { model: truncate(model.label, 26) }),
+      message: $t('settings.modelSettings.delete.message'),
       actions: [
-        { title: 'Cancel', type: 'reset' },
-        { title: 'Delete', type: 'submit', kind: 'danger' }
+        { title: $t('common.actions.cancel'), type: 'reset' },
+        { title: $t('common.actions.delete'), type: 'submit', kind: 'danger' }
       ]
     })
     if (!confirmed) return
@@ -227,6 +235,12 @@
       // Load Google API key
       const googleModel = allModels.find((m) => m.provider === Provider.Google && m.custom_key)
       googleApiKey = googleModel?.custom_key ?? ''
+
+      // Load Claude Agent API key
+      const claudeAgentModel = allModels.find(
+        (m) => m.provider === Provider.ClaudeAgent && m.custom_key
+      )
+      claudeAgentApiKey = claudeAgentModel?.custom_key ?? ''
     })
   })
 </script>
@@ -235,7 +249,7 @@
   <div class="dev-wrapper">
     <div class="space-y-3">
       <div class="w-full flex items-center justify-between">
-        <h2 class="text-xl font-medium">Active Model</h2>
+        <h2 class="text-xl font-medium">{$t('settings.modelSettings.activeModel.title')}</h2>
 
         <div class="block">
           <SelectDropdown
@@ -256,7 +270,9 @@
                 <Icon name={$selectedModel.icon} />
               {/if}
 
-              {$selectedModel ? $selectedModel.label : 'Select Model'}
+              {$selectedModel
+                ? $selectedModel.label
+                : $t('settings.modelSettings.activeModel.select')}
 
               {#if $modelSelectorOpen}
                 <Icon name="chevron.up" className="opacity-60" />
@@ -273,10 +289,7 @@
       </div>
 
       <div class="details-text">
-        <p>
-          Your selected model will be used across all Surf features. Surf may switch to more
-          efficient models from the same provider for certain features.
-        </p>
+        <p>{$t('settings.modelSettings.activeModel.description')}</p>
       </div>
     </div>
   </div>
@@ -284,15 +297,14 @@
   <div class="dev-wrapper">
     <div class="space-y-3">
       <div class="w-full flex items-center justify-between">
-        <h2 class="text-xl font-medium">Configure Models</h2>
+        <h2 class="text-xl font-medium">{$t('settings.modelSettings.configure.title')}</h2>
       </div>
 
       <div class="details-text">
         <p>
-          Configure built-in providers by providing an API key which will be used for all models of
-          that provider or add custom models. Visit our <a href={AI_MODEL_DOCS} target="_blank"
-            >manual</a
-          > for more information.
+          {$t('settings.modelSettings.configure.description')}
+          <a href={AI_MODEL_DOCS} target="_blank">{$t('settings.modelSettings.configure.manual')}</a
+          >
         </p>
       </div>
     </div>
@@ -305,17 +317,17 @@
 
       <div class="provider-config">
         <FormField
-          label="API Key"
-          placeholder="your API key"
+          label={$t('settings.modelSettings.fields.apiKey')}
+          placeholder={$t('settings.modelSettings.fields.apiKeyPlaceholder')}
           infoLink={BUILT_IN_PROVIDER_DEFINITIONS[Provider.OpenAI]?.api_key_page}
-          infoText="Get Key"
+          infoText={$t('settings.modelSettings.actions.getKey')}
           type="password"
           bind:value={openAIApiKey}
           on:save={() => updateProviderApiKey(Provider.OpenAI, openAIApiKey)}
         />
 
         <div class="model-list">
-          <p class="model-list-title">Available Models:</p>
+          <p class="model-list-title">{$t('settings.modelSettings.modelListTitle')}</p>
           <div class="model-chips">
             {#each getProviderModels(Provider.OpenAI) as model}
               <div class="model-chip">
@@ -339,17 +351,17 @@
 
       <div class="provider-config">
         <FormField
-          label="API Key"
-          placeholder="your API key"
+          label={$t('settings.modelSettings.fields.apiKey')}
+          placeholder={$t('settings.modelSettings.fields.apiKeyPlaceholder')}
           infoLink={BUILT_IN_PROVIDER_DEFINITIONS[Provider.Anthropic]?.api_key_page}
-          infoText="Get Key"
+          infoText={$t('settings.modelSettings.actions.getKey')}
           type="password"
           bind:value={anthropicApiKey}
           on:save={() => updateProviderApiKey(Provider.Anthropic, anthropicApiKey)}
         />
 
         <div class="model-list">
-          <p class="model-list-title">Available Models:</p>
+          <p class="model-list-title">{$t('settings.modelSettings.modelListTitle')}</p>
           <div class="model-chips">
             {#each getProviderModels(Provider.Anthropic) as model}
               <div class="model-chip">
@@ -373,17 +385,17 @@
 
       <div class="provider-config">
         <FormField
-          label="API Key"
-          placeholder="your API key"
+          label={$t('settings.modelSettings.fields.apiKey')}
+          placeholder={$t('settings.modelSettings.fields.apiKeyPlaceholder')}
           infoLink={BUILT_IN_PROVIDER_DEFINITIONS[Provider.Google]?.api_key_page}
-          infoText="Get Key"
+          infoText={$t('settings.modelSettings.actions.getKey')}
           type="password"
           bind:value={googleApiKey}
           on:save={() => updateProviderApiKey(Provider.Google, googleApiKey)}
         />
 
         <div class="model-list">
-          <p class="model-list-title">Available Models:</p>
+          <p class="model-list-title">{$t('settings.modelSettings.modelListTitle')}</p>
           <div class="model-chips">
             {#each getProviderModels(Provider.Google) as model}
               <div class="model-chip">
@@ -399,10 +411,55 @@
       </div>
     </Expandable>
 
+    <!-- Claude Code Agent Provider -->
+    <Expandable title="Claude Code Agent" expanded={false}>
+      <div slot="pre-title" class="flex items-center gap-2">
+        <Icon name={ProviderIcons[Provider.ClaudeAgent]} />
+      </div>
+
+      <div class="provider-config">
+        <FormField
+          label={`${$t('settings.modelSettings.fields.apiKey')} (ANTHROPIC_API_KEY)`}
+          placeholder={$t('settings.modelSettings.fields.apiKeyExample')}
+          infoLink={BUILT_IN_PROVIDER_DEFINITIONS[Provider.ClaudeAgent]?.api_key_page}
+          infoText={$t('settings.modelSettings.actions.getKey')}
+          type="password"
+          bind:value={claudeAgentApiKey}
+          on:save={() => updateProviderApiKey(Provider.ClaudeAgent, claudeAgentApiKey)}
+        />
+
+        <div class="model-list">
+          <p class="model-list-title">{$t('settings.modelSettings.modelListTitle')}</p>
+          <div class="model-chips">
+            {#each getProviderModels(Provider.ClaudeAgent) as model}
+              <div class="model-chip">
+                <Icon name={model.icon} />
+                {model.label}
+                {#if !model.vision}
+                  <Icon name="vision.off" className="opacity-60" />
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <div class="details-text" style="margin-top: 1rem;">
+          <p>
+            <strong>Claude Code Agent</strong>
+            {$t('settings.modelSettings.claude.description')}
+          </p>
+          <p style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.8;">
+            <strong>{$t('settings.modelSettings.claude.recommendedLabel')}</strong>
+            {$t('settings.modelSettings.claude.recommendation')}
+          </p>
+        </div>
+      </div>
+    </Expandable>
+
     <!-- Custom Models Section -->
     <div class="space-y-3">
       <div class="w-full flex items-center justify-between gap-4">
-        <span class="custom-kok">Custom Models</span>
+        <span class="custom-kok">{$t('settings.modelSettings.customModels.title')}</span>
         <hr />
         <Dropdown
           items={[
@@ -414,7 +471,7 @@
             })),
             {
               id: 'custom',
-              label: 'Custom',
+              label: $t('settings.modelSettings.customModels.customLabel'),
               icon: 'sparkles',
               action: () => handleCreateNewModel('custom')
             }
@@ -423,7 +480,7 @@
         >
           <Button size="sm" class="add-model-button">
             <Icon name="add" />
-            Add Model
+            {$t('settings.modelSettings.customModels.add')}
           </Button>
         </Dropdown>
       </div>
@@ -456,40 +513,42 @@
 
               <div class="provider-config">
                 <FormField
-                  label="Model Label"
-                  placeholder="My Custom Model"
-                  infoText="Give your custom model a name so you can identify it within Surf's UI"
+                  label={$t('settings.modelSettings.customModels.fields.label')}
+                  placeholder={$t('settings.modelSettings.customModels.fields.labelPlaceholder')}
+                  infoText={$t('settings.modelSettings.customModels.fields.labelHelp')}
                   value={model.label}
                   on:save={(e) => updateModel(model.id, { label: e.detail })}
                 />
 
                 {#if !!modelDefinition}
                   <FormField
-                    label="Model ID"
+                    label={$t('settings.modelSettings.customModels.fields.modelId')}
                     placeholder="llama3.2"
-                    infoText="View List"
+                    infoText={$t('settings.modelSettings.actions.viewList')}
                     infoLink={modelDefinition?.model_page}
                     value={model.custom_model_name ?? ''}
                     on:save={(e) => updateModel(model.id, { custom_model_name: e.detail })}
                   />
                 {:else}
                   <FormField
-                    label="Provider Model ID"
+                    label={$t('settings.modelSettings.customModels.fields.providerModelId')}
                     placeholder="llama3.2"
-                    infoText="The ID of the model from the provider's API"
+                    infoText={$t('settings.modelSettings.customModels.fields.providerModelHelp')}
                     value={model.custom_model_name ?? ''}
                     on:save={(e) => updateModel(model.id, { custom_model_name: e.detail })}
                   />
                 {/if}
 
                 <FormField
-                  label="API Key {modelDefinition && !modelDefinition?.api_key_page
-                    ? '(optional)'
-                    : ''}"
-                  placeholder="{modelDefinition && !modelDefinition?.api_key_page
-                    ? 'optional '
-                    : ''}API key"
-                  infoText="Get Key"
+                  label={`${$t('settings.modelSettings.fields.apiKey')}${
+                    isCustomApiKeyOptional(modelDefinition)
+                      ? ` (${$t('common.labels.optional')})`
+                      : ''
+                  }`}
+                  placeholder={isCustomApiKeyOptional(modelDefinition)
+                    ? $t('settings.modelSettings.fields.optionalApiKeyPlaceholder')
+                    : $t('settings.modelSettings.fields.apiKeyPlaceholder')}
+                  infoText={$t('settings.modelSettings.actions.getKey')}
                   infoLink={modelDefinition?.api_key_page}
                   type="password"
                   value={model.custom_key ?? ''}
@@ -497,17 +556,17 @@
                 />
 
                 <FormField
-                  label="API Endpoint"
+                  label={$t('settings.modelSettings.customModels.fields.endpoint')}
                   placeholder="https://<hostname>/v1/chat/completions"
-                  infoText="Full URL of the model provider's OpenAI compatible API endpoint"
+                  infoText={$t('settings.modelSettings.customModels.fields.endpointHelp')}
                   value={model.provider_url ?? ''}
                   on:save={(e) => updateModel(model.id, { provider_url: e.detail })}
                 />
 
                 <FormField
-                  label="Context Size (tokens)"
+                  label={$t('settings.modelSettings.customModels.fields.contextSize')}
                   placeholder="128000"
-                  infoText="Maximum number of tokens the model supports in the context window"
+                  infoText={$t('settings.modelSettings.customModels.fields.contextSizeHelp')}
                   type="number"
                   value={model.max_tokens ?? 128_000}
                   on:save={(e) => {
@@ -519,16 +578,16 @@
                 />
 
                 <FormField
-                  label="Supports Vision"
-                  infoText="Does the model support vision features like image tagging"
+                  label={$t('settings.modelSettings.customModels.fields.supportsVision')}
+                  infoText={$t('settings.modelSettings.customModels.fields.supportsVisionHelp')}
                   type="checkbox"
                   value={model.vision ?? false}
                   on:save={(e) => updateModel(model.id, { vision: e.detail })}
                 />
 
                 <FormField
-                  label="Supports JSON Format"
-                  infoText="Does the model support outputing in JSON format"
+                  label={$t('settings.modelSettings.customModels.fields.supportsJson')}
+                  infoText={$t('settings.modelSettings.customModels.fields.supportsJsonHelp')}
                   type="checkbox"
                   value={model.supports_json_format ?? false}
                   on:save={(e) => updateModel(model.id, { supports_json_format: e.detail })}
@@ -539,7 +598,7 @@
         </div>
       {:else}
         <p class="no-custom-models">
-          No custom models configured. Add a custom model to get started.
+          {$t('settings.modelSettings.customModels.empty')}
         </p>
       {/if}
     </div>
@@ -591,20 +650,20 @@
     gap: 0.5rem;
 
     h2 {
-      color: light-dark(#1f2937, #cbd5f5);
+      color: light-dark(#1f2937, #e4e7f2);
     }
 
     p {
-      color: light-dark(#374151, #94a3b8);
+      color: light-dark(#374151, var(--text-subtle-dark, #9da4c4));
       line-height: 1.6;
     }
 
     a {
-      color: light-dark(#0284c7, #38bdf8);
+      color: light-dark(#0284c7, var(--accent-dark));
       text-decoration: underline;
 
       &:hover {
-        color: light-dark(#0369a1, #0ea5e9);
+        color: light-dark(#0369a1, var(--accent));
       }
     }
   }
@@ -622,7 +681,7 @@
     padding: 1.25rem;
     margin: 1rem 0;
     box-shadow:
-      0 -0.5px 1px 0 rgba(119, 189, 255, 0.15) inset,
+      0 -0.5px 1px 0 rgba(255, 255, 255, 0.1) inset,
       0 1px 1px 0 #fff inset,
       0 3px 3px 0 rgba(62, 71, 80, 0.02),
       0 1px 2px 0 rgba(62, 71, 80, 0.02),
@@ -636,19 +695,9 @@
     gap: 1.5rem;
 
     @media (prefers-color-scheme: dark) {
-      background: radial-gradient(
-        290.88% 100% at 50% 0%,
-        rgba(30, 41, 59, 0.96) 0%,
-        rgba(15, 23, 42, 0.93) 100%
-      );
-      border: 0.5px solid rgba(71, 85, 105, 0.6);
-      box-shadow:
-        0 -0.5px 1px 0 rgba(129, 146, 255, 0.15) inset,
-        0 1px 1px 0 rgba(71, 85, 105, 0.3) inset,
-        0 3px 3px 0 rgba(0, 0, 0, 0.3),
-        0 1px 2px 0 rgba(0, 0, 0, 0.2),
-        0 1px 1px 0 rgba(0, 0, 0, 0.4),
-        0 0 1px 0 rgba(0, 0, 0, 0.5);
+      background: var(--settings-dark-card);
+      border: 0.5px solid var(--settings-dark-border);
+      box-shadow: var(--settings-dark-card-shadow);
     }
   }
 
@@ -658,15 +707,15 @@
     gap: 0.75rem;
 
     p {
-      color: light-dark(#374151, #94a3b8);
+      color: light-dark(#374151, var(--text-subtle-dark, #9da4c4));
       line-height: 1.6;
     }
 
     a {
-      color: light-dark(#0284c7, #38bdf8);
+      color: light-dark(#0284c7, var(--accent-dark));
 
       &:hover {
-        color: light-dark(#0369a1, #0ea5e9);
+        color: light-dark(#0369a1, var(--accent));
       }
     }
   }
@@ -678,15 +727,15 @@
     padding-bottom: 1rem;
 
     p {
-      color: light-dark(#374151, #94a3b8);
+      color: light-dark(#374151, var(--text-subtle-dark, #9da4c4));
       line-height: 1.6;
     }
 
     a {
-      color: light-dark(#0284c7, #38bdf8);
+      color: light-dark(#0284c7, var(--accent-dark));
 
       &:hover {
-        color: light-dark(#0369a1, #0ea5e9);
+        color: light-dark(#0369a1, var(--accent));
       }
     }
   }
@@ -712,7 +761,7 @@
   .model-list-title {
     font-size: 0.875rem;
     font-weight: 500;
-    color: light-dark(#374151, #94a3b8);
+    color: light-dark(#374151, var(--text-subtle-dark, #9da4c4));
     margin-bottom: 0.5rem;
   }
 
@@ -729,7 +778,7 @@
     padding: 0.375rem 0.75rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: light-dark(#374151, #cbd5f5);
+    color: light-dark(#374151, #e4e7f2);
   }
 
   .custom-model-list {
@@ -739,7 +788,7 @@
   }
 
   .no-custom-models {
-    color: light-dark(#6b7280, #94a3b8);
+    color: light-dark(#6b7280, var(--text-subtle-dark, #9da4c4));
     font-size: 0.875rem;
     text-align: center;
     padding: 1rem;

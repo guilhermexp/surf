@@ -240,15 +240,15 @@
     --background-accent-p3-dark: color(display-p3 0.1 0.1 0.1);
     --border-color: #e0e0e088;
     --outline-color: #e0e0e080;
-    --primary: #66d9ff;
-    --primary-dark: #66d9ff;
+    --primary: #ffffff;
+    --primary-dark: #e0e0e0;
     --green: #a6ff2e;
-    --red: #f92672;
+    --red: #888888;
     --orange: #ff971f;
     --border-width: 0.5px;
-    --color-brand: #f92672;
-    --color-brand-muted: #f92672ba;
-    --color-brand-dark: #f92672;
+    --color-brand: #ffffff;
+    --color-brand-muted: #ffffffba;
+    --color-brand-dark: #e0e0e0;
     --border-radius: 18px;
   }
 

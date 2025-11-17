@@ -168,7 +168,7 @@
     outline: none;
 
     &:focus-within {
-      outline: 2px solid light-dark(rgba(59, 130, 246, 0.5), rgba(129, 146, 255, 0.6));
+      outline: 2px solid light-dark(rgba(143, 143, 143, 0.5), rgba(255, 255, 255, 0.6));
       outline-offset: 2px;
       border-radius: var(--tree-node-border-radius);
     }

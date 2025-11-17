@@ -41,6 +41,7 @@ import {
 
 import { getUserConfig } from '../main/config'
 import { initBackend } from './helpers/backend'
+import { registerClaudeAgentBridge } from '../main/claudeAgent'
 import type { MessagePortCallbackPrimary } from '@deta/services/messagePort'
 
 const USER_DATA_PATH =
@@ -778,6 +779,9 @@ const api = {
 }
 
 const { sffs, resources } = initBackend()
+
+// Register Claude Agent bridge for this renderer process
+registerClaudeAgentBridge(sffs as any)
 
 IPC_EVENTS_RENDERER.setSurfBackendHealth.on((_, state) => {
   // @ts-ignore

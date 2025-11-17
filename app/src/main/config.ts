@@ -1,11 +1,12 @@
 import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { type UserConfig } from '@deta/types'
+import { type Locale, type UserConfig } from '@deta/types'
 import { BUILT_IN_MODELS, BuiltInModelIDs, DEFAULT_AI_MODEL } from '@deta/types/src/ai.types'
 import { useLogScope } from '@deta/utils'
 
 const log = useLogScope('Config')
+const SUPPORTED_LOCALES: Locale[] = ['en', 'pt']
 
 export type Config = {
   [key: string]: any
@@ -81,6 +82,7 @@ export const getUserConfig = (path?: string) => {
       embedding_model: 'multilingual_small',
       tabs_orientation: 'vertical',
       app_style: 'light',
+      language: 'en',
       use_semantic_search: false,
       save_to_user_downloads: true,
       automatic_chat_prompt_generation: true,
@@ -135,6 +137,16 @@ export const getUserConfig = (path?: string) => {
   */
   if (storedConfig.settings.app_style === undefined) {
     storedConfig.settings.app_style = 'light'
+    changedConfig = true
+  }
+
+  const storedLanguage = storedConfig.settings.language
+  if (!storedLanguage) {
+    storedConfig.settings.language = 'en'
+    changedConfig = true
+  } else if (!SUPPORTED_LOCALES.includes(storedLanguage as Locale)) {
+    log.warn(`Unsupported language "${storedLanguage}" found in config; defaulting to English`)
+    storedConfig.settings.language = 'en'
     changedConfig = true
   }
 

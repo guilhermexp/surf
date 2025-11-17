@@ -379,7 +379,7 @@
 
   .error {
     .icon {
-      color: light-dark(IndianRed, var(--danger-dark, #f87171));
+      color: light-dark(IndianRed, var(--danger-dark, #888888));
     }
   }
 

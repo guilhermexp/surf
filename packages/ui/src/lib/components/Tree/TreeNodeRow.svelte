@@ -173,8 +173,8 @@
     --tree-row-height: var(--tree-node-height, 2rem);
     --tree-row-padding: var(--tree-node-padding, 0.25rem);
     --tree-hover-bg: var(--tree-node-hover-bg, rgba(0, 0, 0, 0.05));
-    --tree-selected-bg: var(--tree-node-selected-bg, rgba(59, 130, 246, 0.1));
-    --tree-selected-border: var(--tree-node-selected-border, rgba(59, 130, 246, 0.3));
+    --tree-selected-bg: var(--tree-node-selected-bg, rgba(143, 143, 143, 0.1));
+    --tree-selected-border: var(--tree-node-selected-border, rgba(143, 143, 143, 0.3));
 
     display: flex;
     align-items: center;
@@ -323,8 +323,8 @@
     line-height: 1;
     color: light-dark(rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.7));
     background: light-dark(
-      linear-gradient(to bottom, rgba(210, 226, 255, 0.3), rgba(210, 226, 255, 0.45)),
-      linear-gradient(to bottom, rgba(210, 226, 255, 0.08), rgba(210, 226, 255, 0.14))
+      linear-gradient(to bottom, rgba(224, 224, 224, 0.3), rgba(224, 224, 224, 0.45)),
+      linear-gradient(to bottom, rgba(224, 224, 224, 0.08), rgba(224, 224, 224, 0.14))
     );
     border-radius: 0.5rem;
     white-space: nowrap;

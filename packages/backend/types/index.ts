@@ -1,4 +1,4 @@
-export type Provider = 'open-ai' | 'anthropic' | { custom: string }
+export type Provider = 'open-ai' | 'anthropic' | 'google' | 'claude-agent' | { custom: string }
 
 export type Model =
   | 'gpt-4o'
@@ -7,6 +7,9 @@ export type Model =
   | 'claude-3-7-sonnet-latest'
   | 'claude-3-5-sonnet-latest'
   | 'claude-3-5-haiku-latest'
+  | 'claude-code-agent'
+  | 'claude-sonnet-4-5-20250929'
+  | 'claude-haiku-4-5-20251001'
   | 'gemini-2.0-flash'
   | {
       custom: {

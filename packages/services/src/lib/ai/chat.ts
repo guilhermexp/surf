@@ -66,6 +66,12 @@ export type ChatCompletionResponse = {
   error: ChatError | null
 }
 
+type ChatSendResult = {
+  chat: AIChat
+  output: AIChatMessageParsed | null | undefined
+  error: ChatError | null
+}
+
 export class AIChat {
   id: string
   createdAt: string
@@ -952,7 +958,7 @@ export class AIChat {
     prompt: string,
     opts?: ChatMessageOptions,
     callback?: (message: AIChatMessageParsed) => void
-  ) {
+  ): Promise<ChatSendResult> {
     try {
       const options = {
         useContext: true,

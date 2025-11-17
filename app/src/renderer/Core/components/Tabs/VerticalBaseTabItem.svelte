@@ -8,6 +8,7 @@
   import { useBrowser } from '@deta/services/browser'
   import { spawnBoxSmoke } from '@deta/ui/src/lib/components/Effects/index'
   import { ViewType } from '@deta/services/views'
+  import { translator as t } from '../../i18n'
 
   let {
     tab,
@@ -155,7 +156,9 @@
 
   {#if showTitle}
     <div class="tab-content">
-      <span class="tab-title typo-tab-title">{$title || hostname || 'Untitled'}</span>
+      <span class="tab-title typo-tab-title">
+        {$title || hostname || $t('core.tabs.untitled')}
+      </span>
 
       {#if showPinIndicator && tab.pinned}
         <div class="pin-indicator">
@@ -221,37 +224,23 @@
     }
 
     &.active {
-      border: 0.5px solid light-dark(#fff, rgba(71, 85, 105, 0.6));
       border: 0.5px solid
-        light-dark(color(display-p3 1 1 1), color(display-p3 0.2784 0.3333 0.4118 / 0.6));
-      background: radial-gradient(
-        290.88% 100% at 50% 0%,
-        light-dark(rgba(237, 246, 255, 0.96), rgba(40, 53, 73, 0.92)) 0%,
-        light-dark(rgba(246, 251, 255, 0.93), rgba(26, 26, 26, 0.88)) 100%
-      );
-      background: radial-gradient(
-        290.88% 100% at 50% 0%,
-        light-dark(
-            color(display-p3 0.9365 0.9644 0.9997 / 0.96),
-            color(display-p3 0.1569 0.2078 0.2863 / 0.92)
-          )
-          0%,
-        light-dark(
-            color(display-p3 0.9686 0.9843 1 / 0.93),
-            color(display-p3 0.1059 0.1412 0.2196 / 0.88)
-          )
-          100%
+        light-dark(rgba(15, 23, 42, 0.08), color(display-p3 0.9255 0.9529 1 / 0.28));
+      background: light-dark(
+        linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(246, 248, 255, 0.55) 100%),
+        linear-gradient(135deg, rgba(22, 27, 39, 0.65) 0%, rgba(14, 19, 30, 0.45) 100%)
       );
       box-shadow:
-        0 -0.5px 1px 0 light-dark(rgba(119, 189, 255, 0.15), rgba(129, 146, 255, 0.22)) inset,
-        0 1px 1px 0 light-dark(#fff, rgba(71, 85, 105, 0.3)) inset,
-        0 2px 8px 0 light-dark(rgba(62, 71, 80, 0.1), rgba(15, 23, 42, 0.45)),
-        0 1px 3px 0 light-dark(rgba(62, 71, 80, 0.1), rgba(15, 23, 42, 0.28));
+        0 8px 24px 0 light-dark(rgba(35, 50, 64, 0.12), rgba(5, 8, 14, 0.55)),
+        inset 0 0 0 0.65px light-dark(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08));
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
 
       .tab-title {
-        color: light-dark(var(--on-surface-accent), var(--on-surface-accent-dark));
+        color: light-dark(var(--on-app-background), var(--on-surface-dark, #f8f8f2));
+        text-shadow: none;
       }
-      color: light-dark(var(--on-surface-accent), var(--on-surface-accent-dark));
+      color: light-dark(var(--on-app-background), var(--on-surface-dark, #f8f8f2));
     }
 
     &:hover:not(.pinned) {
