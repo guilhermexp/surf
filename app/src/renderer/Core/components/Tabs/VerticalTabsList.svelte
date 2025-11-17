@@ -27,7 +27,7 @@
   let needsScrolling = $state(false)
 
   // Resize handle state
-  const TABS_WIDTH = 400
+  const TABS_WIDTH = 360
 
   const dnd = createTabsDragAndDrop(tabsService)
 

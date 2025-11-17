@@ -74,6 +74,7 @@
     }
 
     if (behavior === 'hover') {
+      verticalTabsHoverActive = false
       persistVerticalTabsCollapsed(true)
     } else {
       persistVerticalTabsCollapsed(false)
@@ -823,8 +824,8 @@
     display: flex;
     align-items: stretch;
     height: 100%;
-    --vertical-tabs-width: 400px;
-    width: var(--vertical-tabs-width, 400px);
+    --vertical-tabs-width: 360px;
+    width: var(--vertical-tabs-width, 360px);
     transition: width 150ms ease-out;
     position: relative;
     overflow: visible;

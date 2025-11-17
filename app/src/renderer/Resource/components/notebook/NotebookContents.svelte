@@ -464,7 +464,7 @@
     {/if}
   {/if}
 {:else if activeTab === 'notes'}
-  <ul>
+  <ul class="notes-list">
     <!-- {#if !searchQuery}
       <NotebookSidebarNoteName onclick={() => handleCreateNote()} />
     {/if} -->
@@ -769,5 +769,11 @@
     &:hover {
       opacity: 0.5 !important;
     }
+  }
+
+  .notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 </style>

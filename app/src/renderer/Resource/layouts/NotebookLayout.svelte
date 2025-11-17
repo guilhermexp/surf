@@ -15,6 +15,7 @@
   .notebook {
     position: relative;
     overflow-x: hidden;
+    background: light-dark(var(--app-background), var(--app-background-dark));
 
     //.bg {
     //  content: '';
