@@ -823,7 +823,8 @@
     display: flex;
     align-items: stretch;
     height: 100%;
-    width: var(--vertical-tabs-width, 280px);
+    --vertical-tabs-width: 400px;
+    width: var(--vertical-tabs-width, 400px);
     transition: width 150ms ease-out;
     position: relative;
     overflow: visible;

@@ -293,6 +293,10 @@
 
     transition: background 123ms ease-out;
 
+    :global(body.os_mac) & {
+      padding-left: calc(env(titlebar-area-width, 80px) + 0.75rem);
+    }
+
     &.grey {
       background: transparent;
       box-shadow: none;

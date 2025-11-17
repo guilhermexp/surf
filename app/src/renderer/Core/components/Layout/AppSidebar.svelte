@@ -28,42 +28,7 @@
   const activeSidebarView = $derived(viewManager.activeSidebarView)
   const activeSidebarLocation = $derived(activeSidebarView?.url ?? writable(null))
 
-  let isResizing = $state(false)
-  let targetSidebarWidth = 670
-  let sidebarWidth = $state(670)
-  let raf = null
-
-  const rafCbk = () => {
-    sidebarWidth = targetSidebarWidth
-    raf = null
-  }
-
-  const handleResizeMouseDown = (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    document.body.style.userSelect = 'none'
-    document.body.style.cursor = 'col-resize'
-
-    window.addEventListener('mousemove', handleResizingMouseMove, { capture: true })
-    window.addEventListener('mouseup', handleResizingMouseUp, { capture: true, once: true })
-    isResizing = true
-  }
-  const handleResizingMouseMove = (e: MouseEvent) => {
-    e.preventDefault()
-    targetSidebarWidth = Math.max(
-      500,
-      Math.min(targetSidebarWidth - e.movementX, window.innerWidth - 500)
-    )
-    if (raf === null) requestAnimationFrame(rafCbk)
-  }
-  const handleResizingMouseUp = (e: MouseEvent) => {
-    e.preventDefault()
-    window.removeEventListener('mousemove', handleResizingMouseMove, { capture: true })
-    isResizing = false
-    document.body.style.userSelect = ''
-    document.body.style.cursor = ''
-    sidebarStore.update('cfg', { siderbar_width: targetSidebarWidth })
-  }
+  const SIDEBAR_WIDTH = 670
 
   const handleNewNote = async () => {
     let notebookId: string | undefined = undefined
@@ -110,15 +75,11 @@
         view: viewManager.create({ url: cfg.sidebar_location, permanentlyActive: true })
       })
     }
-
-    targetSidebarWidth = cfg.siderbar_width ?? 670
-    rafCbk()
   })
 </script>
 
 {#if viewManager.sidebarViewOpen && viewManager.activeSidebarView}
-  <div class="container" style:--sidebarWidth={sidebarWidth + 'px'}>
-    <div class="resize-handle" onmousedown={handleResizeMouseDown} data-resizing={isResizing}></div>
+  <div class="container" style:--sidebarWidth={SIDEBAR_WIDTH + 'px'}>
     <aside class:open={viewManager.sidebarViewOpen}>
       <div class="sidebar-content">
         {#if viewManager.activeSidebarView}
@@ -216,51 +177,6 @@
     //    0 -2px 1px 0 rgba(9, 10, 11, 0.01),
     //    0 -1px 1px 0 rgba(9, 10, 11, 0.03);
     //}
-  }
-  .resize-handle {
-    flex-shrink: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: var(--fold-width);
-    transform: translateX(-100%);
-    cursor: ew-resize;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    z-index: 10;
-
-    &::before {
-      content: '';
-      z-index: 5;
-      position: absolute;
-      left: calc(50%);
-      top: 50%;
-      height: 30%;
-      width: 3px;
-      transform: translate(-50%, -50%);
-      background: transparent;
-      border-radius: 20px;
-      transition: background 123ms ease-out;
-    }
-
-    &:hover::before {
-      background: light-dark(
-        var(--overlay-strong, rgba(0, 0, 0, 0.25)),
-        var(--overlay-strong-dark, rgba(15, 23, 42, 0.6))
-      );
-    }
-
-    &:active::before,
-    &[data-resizing='true']::before {
-      background: light-dark(
-        var(--overlay-modal, rgba(0, 0, 0, 0.5)),
-        var(--overlay-modal-dark, rgba(15, 23, 42, 0.7))
-      );
-      width: 4px;
-    }
   }
   aside {
     display: flex;

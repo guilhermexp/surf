@@ -27,47 +27,12 @@
   let needsScrolling = $state(false)
 
   // Resize handle state
-  let isResizingWidth = $state(false)
-  let targetTabsWidth = $state(240)
-  let tabsWidth = $state(240)
-  let raf = null
+  const TABS_WIDTH = 400
 
   const dnd = createTabsDragAndDrop(tabsService)
 
   const handleNewTab = () => {
     tabsService.openNewTabPage()
-  }
-
-  // Resize handle functions
-  const rafCbk = () => {
-    tabsWidth = targetTabsWidth
-    raf = null
-  }
-
-  const handleResizeMouseDown = (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    document.body.style.userSelect = 'none'
-    document.body.style.cursor = 'col-resize'
-
-    window.addEventListener('mousemove', handleResizingMouseMove, { capture: true })
-    window.addEventListener('mouseup', handleResizingMouseUp, { capture: true, once: true })
-    isResizingWidth = true
-  }
-
-  const handleResizingMouseMove = (e: MouseEvent) => {
-    e.preventDefault()
-    targetTabsWidth = Math.max(200, Math.min(targetTabsWidth + e.movementX, 400))
-    if (raf === null) raf = requestAnimationFrame(rafCbk)
-  }
-
-  const handleResizingMouseUp = (e: MouseEvent) => {
-    e.preventDefault()
-    window.removeEventListener('mousemove', handleResizingMouseMove, { capture: true })
-    isResizingWidth = false
-    document.body.style.userSelect = ''
-    document.body.style.cursor = ''
-    // TODO: Save width to user preferences
   }
 
   // Reactive calculation of layout
@@ -144,7 +109,7 @@
 <div
   class="vertical-tabs-list"
   bind:this={containerElement}
-  style:--tabsWidth={tabsWidth + 'px'}
+  style:--tabsWidth={TABS_WIDTH + 'px'}
   class:mac={isMac()}
 >
   <div
@@ -197,12 +162,6 @@
       <Icon name="add" size="1.1rem" />
     </Button>
   </div>
-
-  <div
-    class="resize-handle"
-    onmousedown={handleResizeMouseDown}
-    data-resizing={isResizingWidth}
-  ></div>
 </div>
 
 <style lang="scss">
@@ -210,8 +169,8 @@
     position: relative;
     height: 100%;
     width: var(--tabsWidth, 240px);
-    min-width: 200px;
-    max-width: 400px;
+    min-width: var(--tabsWidth, 240px);
+    max-width: var(--tabsWidth, 240px);
     padding-top: 3rem;
     display: flex;
     flex-direction: column;
@@ -355,44 +314,6 @@
     background: light-dark(var(--border-color), var(--border-color-dark));
     margin: 0.5rem 0.75rem;
     opacity: 0.3;
-  }
-
-  .resize-handle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: var(--fold-width);
-    cursor: ew-resize;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    app-region: no-drag;
-
-    &::before {
-      content: '';
-      z-index: 5;
-      position: absolute;
-      left: calc(50%);
-      top: 50%;
-      height: 30%;
-      width: 3px;
-      transform: translate(-50%, -50%);
-      background: transparent;
-      border-radius: 20px;
-      transition: background 123ms ease-out;
-    }
-
-    &:hover::before {
-      background: light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.2));
-    }
-
-    &:active::before,
-    &[data-resizing='true']::before {
-      background: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.35));
-      width: 4px;
-    }
   }
 
   /* View Transitions for smooth tab reordering */
