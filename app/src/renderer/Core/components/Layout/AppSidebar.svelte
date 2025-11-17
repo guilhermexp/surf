@@ -28,7 +28,45 @@
   const activeSidebarView = $derived(viewManager.activeSidebarView)
   const activeSidebarLocation = $derived(activeSidebarView?.url ?? writable(null))
 
-  const SIDEBAR_WIDTH = 670
+  const MIN_SIDEBAR_WIDTH = 420
+  const MAX_SIDEBAR_WIDTH = 900
+  const DEFAULT_SIDEBAR_WIDTH = 670
+
+  let sidebarWidth = $state(DEFAULT_SIDEBAR_WIDTH)
+  let isResizing = $state(false)
+  let containerEl: HTMLDivElement
+  let sidebarStoreReady = false
+
+  const clampSidebarWidth = (value: number) =>
+    Math.max(MIN_SIDEBAR_WIDTH, Math.min(MAX_SIDEBAR_WIDTH, value))
+
+  const debouncedSaveWidth = useDebounce((width: number) => {
+    if (!sidebarStoreReady) return
+    sidebarStore.update('cfg', { siderbar_width: width })
+  }, 200)
+
+  const updateWidthFromPointer = (event: MouseEvent) => {
+    if (!containerEl) return
+    const { right } = containerEl.getBoundingClientRect()
+    const newWidth = clampSidebarWidth(right - event.clientX)
+    sidebarWidth = newWidth
+    debouncedSaveWidth(newWidth)
+  }
+
+  const startResize = (event: MouseEvent) => {
+    event.preventDefault()
+    isResizing = true
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    updateWidthFromPointer(event)
+  }
+
+  const stopResize = () => {
+    if (!isResizing) return
+    isResizing = false
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }
 
   const handleNewNote = async () => {
     let notebookId: string | undefined = undefined
@@ -63,10 +101,16 @@
 
   onMount(async () => {
     if ((await sidebarStore.read('cfg')) === undefined) {
-      await sidebarStore.create({ id: 'cfg', siderbar_width: 670, sidebar_location: 'surf://new' })
+      await sidebarStore.create({
+        id: 'cfg',
+        siderbar_width: DEFAULT_SIDEBAR_WIDTH,
+        sidebar_location: 'surf://new'
+      })
     }
 
     const cfg = await sidebarStore.read('cfg')
+    sidebarStoreReady = true
+    sidebarWidth = clampSidebarWidth(cfg?.siderbar_width ?? DEFAULT_SIDEBAR_WIDTH)
 
     // NOTE: We could move the initialization into core so that it loads a bit faster on first open
     if (viewManager.activeSidebarView === undefined) {
@@ -76,10 +120,38 @@
       })
     }
   })
+
+  onMount(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!isResizing) return
+      updateWidthFromPointer(event)
+    }
+
+    const handleMouseUp = () => {
+      if (!isResizing) return
+      stopResize()
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  })
 </script>
 
 {#if viewManager.sidebarViewOpen && viewManager.activeSidebarView}
-  <div class="container" style:--sidebarWidth={SIDEBAR_WIDTH + 'px'}>
+  <div class="container" bind:this={containerEl} style:--sidebarWidth={sidebarWidth + 'px'}>
+    <div
+      class="resize-handle"
+      class:resizing={isResizing}
+      onmousedown={startResize}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize sidebar"
+    ></div>
     <aside class:open={viewManager.sidebarViewOpen}>
       <div class="sidebar-content">
         {#if viewManager.activeSidebarView}
@@ -131,6 +203,7 @@
     display: flex;
     position: relative;
     width: var(--sidebarWidth);
+    min-width: var(--sidebarWidth);
     flex-shrink: 0;
     --fold-width: 0.5rem;
 
@@ -178,6 +251,35 @@
     //    0 -1px 1px 0 rgba(9, 10, 11, 0.03);
     //}
   }
+
+  .resize-handle {
+    width: 6px;
+    cursor: col-resize;
+    flex-shrink: 0;
+    position: relative;
+    height: 100%;
+    z-index: 2;
+    margin-left: -3px;
+    border-radius: 999px;
+    background: transparent;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: light-dark(#d9d9d944, rgba(255, 255, 255, 0.08));
+      box-shadow: 0 0 0 1px light-dark(#ffffff55, rgba(0, 0, 0, 0.25));
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    &:hover::before,
+    &.resizing::before {
+      opacity: 1;
+    }
+  }
+
   aside {
     display: flex;
     width: 100%;

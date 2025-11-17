@@ -155,6 +155,7 @@
   class:roundLeftCorner
   class:roundRightCorner
   class="navbar"
+  data-sidebar-open={viewManager.sidebarViewOpen}
 >
   {@render leftChildren?.()}
 
@@ -295,6 +296,14 @@
 
     :global(body.os_mac) & {
       padding-left: calc(env(titlebar-area-width, 80px) + 0.75rem);
+    }
+
+    &[data-sidebar-open='false'] {
+      padding-left: 7rem;
+    }
+
+    :global(body.os_mac) &[data-sidebar-open='false'] {
+      padding-left: calc(env(titlebar-area-width, 80px) + 7rem);
     }
 
     &.grey {

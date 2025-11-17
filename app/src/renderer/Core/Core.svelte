@@ -850,10 +850,17 @@
     z-index: 15;
     padding: 0;
     background: transparent;
+    pointer-events: auto;
   }
 
-  .vertical-tabs-controls[data-expanded='false'] {
-    transform: translateX(40%);
+  .vertical-tabs-shell[data-expanded='false'] .vertical-tabs-controls {
+    right: auto;
+    left: 0.75rem;
+    transform: none;
+  }
+
+  :global(body.os_mac) .vertical-tabs-shell[data-expanded='false'] .vertical-tabs-controls {
+    left: calc(env(titlebar-area-width, 80px) + 0.75rem);
   }
 
   .vertical-tabs-controls :global(.vertical-tabs-icon-button[data-button-root]) {
