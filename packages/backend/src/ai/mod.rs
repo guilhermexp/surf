@@ -2,8 +2,6 @@ pub mod claude_agent;
 pub mod embeddings;
 pub mod llm;
 pub mod youtube;
-
-#[cfg(feature = "wip")]
 pub mod brain;
 
 mod local;
@@ -13,7 +11,9 @@ pub const _MODULE_PREFIX: &str = "ai";
 pub const _AI_API_ENDPOINT: &str = "v1/deta-os-ai";
 
 use std::str::FromStr;
+use std::sync::Arc;
 
+use crate::ai::brain::orchestrator::Orchestrator;
 use crate::ai::claude_agent::ClaudeAgentRuntime;
 use crate::ai::embeddings::chunking::ContentChunker;
 use crate::ai::llm::client;
@@ -85,9 +85,11 @@ pub struct ShouldClusterResult {
 }
 
 pub struct AI {
-    pub client: client::LLMClient,
+    pub client: Arc<client::LLMClient>,
     pub chunker: ContentChunker,
     local_ai_client: LocalAIClient,
+    js_tool_registry: Arc<crate::ai::brain::js_tools::JSToolRegistry>,
+    orchestrator: Orchestrator,
 }
 
 fn human_readable_current_time() -> String {
@@ -102,13 +104,26 @@ impl AI {
         local_ai_socket_path: String,
         claude_agent_runtime: Option<ClaudeAgentRuntime>,
     ) -> BackendResult<Self> {
-        let mut client = client::LLMClient::new()?;
-        client.set_claude_agent_runtime(claude_agent_runtime);
+        let mut client_inner = client::LLMClient::new()?;
+        client_inner.set_claude_agent_runtime(claude_agent_runtime);
+        let client = Arc::new(client_inner);
+        let js_tool_registry = Arc::new(crate::ai::brain::js_tools::JSToolRegistry::new());
+        let orchestrator = Orchestrator::new(Arc::clone(&client), Arc::clone(&js_tool_registry))?;
         Ok(Self {
             client,
             chunker: ContentChunker::new(2000, 1),
             local_ai_client: LocalAIClient::new(local_ai_socket_path),
+            js_tool_registry,
+            orchestrator,
         })
+    }
+
+    pub fn js_tool_registry(&self) -> std::sync::Arc<crate::ai::brain::js_tools::JSToolRegistry> {
+        Arc::clone(&self.js_tool_registry)
+    }
+
+    pub fn orchestrator(&self) -> &Orchestrator {
+        &self.orchestrator
     }
 
     pub fn parse_chat_history(
@@ -301,6 +316,8 @@ impl AI {
                 source_url: None,
                 author: None,
                 description: None,
+                timestamp: None,
+                resource_text_content_id: None,
             };
             // TODO: is author info easily retreivable or stored?
             if let Some(metadata) = &resource.metadata {
@@ -340,6 +357,8 @@ impl AI {
                 source_url: None,
                 author: None,
                 description: None,
+                timestamp: None,
+                resource_text_content_id: None,
             };
             // TODO: is author info easily retreivable or stored?
             if let Some(metadata) = &resource.metadata {
@@ -463,11 +482,13 @@ impl AI {
 
         messages.push(Message::new_user(&input.query));
         let messages_slice = messages[history_len + 1..].to_vec().clone();
+        let cancellation_token = client::CancellationToken::new();
         let stream = self.client.create_streaming_chat_completion(
             messages,
             &input.model,
             input.custom_key,
             None,
+            cancellation_token,
         )?;
 
         Ok(ChatResult {
@@ -509,7 +530,8 @@ impl AI {
                 messages.push(Message::new_image(&image));
             }
         }
+        let cancellation_token = client::CancellationToken::new();
         self.client
-            .create_streaming_chat_completion(messages, model, custom_key, None)
+            .create_streaming_chat_completion(messages, model, custom_key, None, cancellation_token)
     }
 }

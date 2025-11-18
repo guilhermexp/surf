@@ -109,7 +109,8 @@ export function createWindow() {
       preload: join(__dirname, '../preload/core.js'),
       additionalArguments: [
         `--userDataPath=${app.getPath('userData')}`,
-        `--appPath=${app.getAppPath()}${isDev ? '' : '.unpacked'}`,
+        // FIX: In dev mode, remove '.unpacked' to find OCR resources in 'app/resources/ocrs/'
+        `--appPath=${isDev ? app.getAppPath().replace('.unpacked', '') : `${app.getAppPath()}.unpacked`}`,
         `--pdf-viewer-entry-point=${PDFViewerEntryPoint}`,
         `--settings-window-entry-point=${SettingsWindowEntrypoint}`,
         ...(process.env.ENABLE_DEBUG_PROXY ? ['--enable-debug-proxy'] : []),

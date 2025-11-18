@@ -1,5 +1,6 @@
 import { isWindows } from '@deta/utils'
-import { spawn, type ChildProcess, execSync } from 'child_process'
+import { spawn, execSync } from 'child_process'
+import type { ChildProcess } from 'child_process'
 
 import EventEmitter from 'events'
 import { basename } from 'path'

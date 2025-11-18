@@ -64,6 +64,7 @@ export class SFFS {
   backend: any
   fs: any
   log: ScopedLogger
+  private registeredTools = new Set<string>()
 
   constructor() {
     this.log = useLogScope('SFFS')
@@ -86,6 +87,38 @@ export class SFFS {
     if (!this.backend) {
       throw new Error('SFFS backend failed to initialize')
     }
+  }
+
+  async registerTool(
+    toolId: string,
+    handler: (...args: any[]) => any | Promise<any>
+  ): Promise<void> {
+    if (this.registeredTools.has(toolId)) {
+      this.log.debug('tool already registered, skipping', toolId)
+      return
+    }
+
+    const wrappedHandler = async (...args: any[]) => {
+      const result = await handler(...args)
+      return typeof result === 'string' ? result : JSON.stringify(result ?? null)
+    }
+
+    await this.withErrorHandling(
+      this.backend,
+      this.backend.js__ai_register_tool,
+      toolId,
+      wrappedHandler
+    )
+    this.registeredTools.add(toolId)
+  }
+
+  async unregisterTool(toolId: string): Promise<void> {
+    if (!this.registeredTools.has(toolId)) {
+      return
+    }
+
+    await this.withErrorHandling(this.backend, this.backend.js__ai_unregister_tool, toolId)
+    this.registeredTools.delete(toolId)
   }
 
   convertCompositeResourceToResource(composite: SFFSRawCompositeResource): SFFSResource {
@@ -1088,6 +1121,8 @@ export class SFFS {
       inlineImages?: string[]
       general?: boolean
       appCreation?: boolean
+      websearch?: boolean
+      surflet?: boolean
     }
   ): Promise<void> {
     this.log.debug(
@@ -1118,7 +1153,9 @@ export class SFFS {
       limit: opts?.limit ?? 20,
       rag_only: opts?.ragOnly,
       general: opts?.general,
-      app_creation: opts?.appCreation
+      app_creation: opts?.appCreation,
+      websearch: opts?.websearch,
+      surflet: opts?.surflet
     }
     return this.withErrorHandling(
       this.backend,

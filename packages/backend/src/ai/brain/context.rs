@@ -2,12 +2,17 @@ use crate::{
     ai::{
         brain::{
             agents::context::ContextManager,
-            js_tools::{JSToolRegistry, ToolName},
+            js_tools::{tool_ids, JSToolRegistry},
         },
         llm::models::{ContextMessage, Message},
         youtube::{fetch_transcript, is_youtube_video_url},
     },
-    store::{db::Database, models::CompositeResource},
+    store::{
+        db::Database,
+        models::{
+            AIChatSessionMessageSource, AIChatSessionMessageSourceMetadata, CompositeResource,
+        },
+    },
     BackendError, BackendResult,
 };
 use std::collections::HashMap;
@@ -172,6 +177,7 @@ impl LLMContext {
                 author: None,
                 description: None,
                 timestamp: None,
+                resource_text_content_id: None,
             };
             if let Some(metadata) = &resource.metadata {
                 if !metadata.name.is_empty() {
@@ -257,6 +263,26 @@ impl LLMContext {
         }
         Ok(())
     }
+    pub fn current_sources(&self) -> Vec<AIChatSessionMessageSource> {
+        self.context_items
+            .values()
+            .filter_map(|ci| {
+                let resource_id = ci.resource_id.clone()?;
+                let metadata = AIChatSessionMessageSourceMetadata {
+                    timestamp: None,
+                    url: ci.message.source_url.clone(),
+                    page: ci.message.page,
+                };
+
+                Some(AIChatSessionMessageSource {
+                    id: ci.message.id.clone(),
+                    uid: ci.resource_text_content_id.clone().unwrap_or_default(),
+                    resource_id,
+                    metadata: Some(metadata),
+                })
+            })
+            .collect()
+    }
 }
 
 impl ContextManager for LLMContext {
@@ -322,7 +348,7 @@ impl ContextManager for LLMContext {
         } else {
             let result: ScrapeWebpageResult = self
                 .js_tool_registry
-                .execute_tool(&ToolName::ScrapeURL, Some(vec![url.to_string()]))?;
+                .execute_tool(tool_ids::SCRAPE_URL, Some(vec![url.to_string()]))?;
             (
                 "Context(Webpage)",
                 Some(result.title),
@@ -342,6 +368,7 @@ impl ContextManager for LLMContext {
             description: None,
             created_at: None,
             timestamp: None,
+            resource_text_content_id: None,
         };
 
         self.context_items.insert(
@@ -385,4 +412,5 @@ impl ContextManager for LLMContext {
             ))
         }
     }
+
 }

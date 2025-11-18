@@ -227,6 +227,13 @@ pub enum MiscMessage {
         number_documents: i32,
         resource_ids: Option<Vec<String>>,
     },
+    RegisterTool {
+        tool_id: String,
+        callback: Root<JsFunction>,
+    },
+    UnregisterTool {
+        tool_id: String,
+    },
 }
 
 #[derive(Debug, serde::Serialize)]

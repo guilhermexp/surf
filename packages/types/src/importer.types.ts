@@ -31,8 +31,29 @@ export type BrowserTypeItem = {
   }
 }
 
-// @ts-ignore - can't import @deta/utils package in @deta/types so using import.meta.env directly
-export const PLATFORM = import.meta.env.PLATFORM as 'darwin' | 'linux' | 'win32'
+const detectPlatform = (): 'darwin' | 'linux' | 'win32' => {
+  const globalEnv = (globalThis as any).__SURF_RUNTIME_ENV__
+  const runtimeValue = globalEnv?.PLATFORM
+  if (runtimeValue === 'darwin' || runtimeValue === 'linux' || runtimeValue === 'win32') {
+    return runtimeValue
+  }
+
+  if (typeof process !== 'undefined' && process.platform) {
+    if (process.platform === 'darwin') return 'darwin'
+    if (process.platform === 'win32') return 'win32'
+  }
+
+  if (typeof navigator !== 'undefined') {
+    const uaData = (navigator as { userAgentData?: { platform?: string } }).userAgentData
+    const platform = uaData?.platform ?? navigator.platform ?? ''
+    if (/mac/i.test(platform)) return 'darwin'
+    if (/win/i.test(platform)) return 'win32'
+  }
+
+  return 'linux'
+}
+
+export const PLATFORM = detectPlatform()
 
 export const BROWSER_TYPE_DATA: BrowserTypeItem[] = [
   {

@@ -1,7 +1,12 @@
 use crate::{
     ai::{
+        brain::{
+            agents::{context::ContextManager, ExecuteConfig},
+            context::LLMContext,
+            io::{CallbackIO, NoteIO},
+        },
         llm::{
-            client::Model,
+            client::{CancellationToken, Model},
             models::{Message, MessageContent},
         },
         youtube::YoutubeTranscript,
@@ -21,11 +26,28 @@ use crate::{
 };
 use neon::prelude::*;
 use std::collections::HashSet;
+use uuid::Uuid;
 
 impl Worker {
     pub fn print(&mut self, content: String) -> BackendResult<String> {
         println!("print: {}", content);
         Ok("ok".to_owned())
+    }
+
+    pub fn register_tool(
+        &self,
+        tool_id: String,
+        callback: Root<JsFunction>,
+    ) -> BackendResult<String> {
+        let registry = self.ai.js_tool_registry();
+        registry.add_tool(tool_id, callback, self.channel.clone())?;
+        Ok("true".to_string())
+    }
+
+    pub fn unregister_tool(&self, tool_id: String) -> BackendResult<String> {
+        let registry = self.ai.js_tool_registry();
+        let removed = registry.remove_tool(&tool_id)?;
+        Ok(removed.to_string())
     }
 
     pub fn get_ai_chat_message(&mut self, id: String) -> BackendResult<AIChatSessionHistory> {
@@ -252,6 +274,14 @@ impl Worker {
                 .parse_chat_history(self.db.list_ai_session_messages_skip_sources(session_id)?)?;
         }
 
+        let advanced_tools_enabled = chat_input.websearch || chat_input.surflet;
+        if chat_input.note_resource_id.is_some() && advanced_tools_enabled {
+            return self.handle_agentic_note_query(callback, chat_input);
+        }
+        if advanced_tools_enabled {
+            return self.handle_agentic_chat_query(session_id, callback, chat_input, history);
+        }
+
         let mut should_cluster = false;
         let send_cluster_query =
             !chat_input.general && self.should_send_cluster_query(&chat_input.resource_ids)?;
@@ -297,6 +327,108 @@ impl Worker {
         if let Some(session_id) = session_id {
             self.save_messages(session_id, assistant_message, chat_result)?;
         }
+        Ok(())
+    }
+
+    fn handle_agentic_note_query(
+        &mut self,
+        callback: Root<JsFunction>,
+        chat_input: ChatInput,
+    ) -> BackendResult<()> {
+        let note_id = chat_input
+            .note_resource_id
+            .clone()
+            .ok_or_else(|| BackendError::GenericError("Note ID missing for agentic query".into()))?;
+        let inline_images = chat_input.inline_images.clone().unwrap_or_default();
+
+        let js_tool_registry = self.ai.js_tool_registry();
+        let mut context_manager = LLMContext::new(
+            &self.db_path,
+            js_tool_registry,
+            note_id.clone(),
+            &chat_input.resource_ids,
+            &inline_images,
+            Some(self.language_setting.clone()),
+        )?;
+
+        let sources_xml = context_manager.get_sources_xml(&note_id)?;
+        let callback = self.send_callback(callback, sources_xml)?;
+
+        let note_io = NoteIO::new(
+            &self.resources_path,
+            note_id.clone(),
+            callback,
+            None,
+            self.channel.clone(),
+            Some(1024),
+        )?;
+
+        let execute_config = ExecuteConfig {
+            execution_id: format!("agentic-note-{}", Uuid::new_v4()),
+            user_message: chat_input.query,
+            system_message_preamble: None,
+            model: chat_input.model,
+            custom_key: chat_input.custom_key,
+            allowed_tools: None,
+        };
+
+        self.ai.orchestrator().execute_lead_agent(
+            execute_config,
+            &note_io,
+            &mut context_manager,
+            CancellationToken::new(),
+        )?;
+
+        Ok(())
+    }
+
+    fn handle_agentic_chat_query(
+        &mut self,
+        session_id: Option<String>,
+        callback: Root<JsFunction>,
+        chat_input: ChatInput,
+        _history: Vec<Message>,
+    ) -> BackendResult<()> {
+        let chat_key = session_id
+            .clone()
+            .unwrap_or_else(|| format!("agentic-chat-{}", Uuid::new_v4()));
+        let inline_images = chat_input.inline_images.clone().unwrap_or_default();
+
+        let js_tool_registry = self.ai.js_tool_registry();
+        let mut context_manager = LLMContext::new(
+            &self.db_path,
+            js_tool_registry,
+            chat_key.clone(),
+            &chat_input.resource_ids,
+            &inline_images,
+            Some(self.language_setting.clone()),
+        )?;
+
+        let sources_xml = context_manager.get_sources_xml(&chat_key)?;
+        let callback = self.send_callback(callback, sources_xml)?;
+        let chat_io = CallbackIO::new(chat_key, callback, None, self.channel.clone(), Some(1024))?;
+
+        let execute_config = ExecuteConfig {
+            execution_id: format!("agentic-chat-{}", Uuid::new_v4()),
+            user_message: chat_input.query,
+            system_message_preamble: None,
+            model: chat_input.model,
+            custom_key: chat_input.custom_key,
+            allowed_tools: None,
+        };
+
+        self.ai.orchestrator().execute_lead_agent(
+            execute_config,
+            &chat_io,
+            &mut context_manager,
+            CancellationToken::new(),
+        )?;
+
+        if let Some(session_id) = session_id {
+            let sources = context_manager.current_sources();
+            self.save_agent_message(session_id, chat_io.content(), sources)?;
+        }
+
         Ok(())
     }
 
@@ -459,6 +591,30 @@ impl Worker {
             },
         )?;
 
+        tx.commit()?;
+        Ok(())
+    }
+
+    fn save_agent_message(
+        &mut self,
+        session_id: String,
+        assistant_message: String,
+        sources: Vec<AIChatSessionMessageSource>,
+    ) -> BackendResult<()> {
+        let mut tx = self.db.begin()?;
+        Database::create_ai_session_message_tx(
+            &mut tx,
+            &AIChatSessionMessage {
+                ai_session_id: session_id,
+                role: "assistant".to_owned(),
+                content: assistant_message,
+                truncatable: false,
+                is_context: false,
+                msg_type: "text".to_owned(),
+                created_at: chrono::Utc::now(),
+                sources: if sources.is_empty() { None } else { Some(sources) },
+            },
+        )?;
         tx.commit()?;
         Ok(())
     }
@@ -868,6 +1024,14 @@ pub fn handle_misc_message(
                 number_documents,
                 resource_ids,
             );
+            send_worker_response(&mut worker.channel, oneshot, result)
+        }
+        MiscMessage::RegisterTool { tool_id, callback } => {
+            let result = worker.register_tool(tool_id, callback);
+            send_worker_response(&mut worker.channel, oneshot, result)
+        }
+        MiscMessage::UnregisterTool { tool_id } => {
+            let result = worker.unregister_tool(tool_id);
             send_worker_response(&mut worker.channel, oneshot, result)
         }
     }

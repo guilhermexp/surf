@@ -5,6 +5,7 @@ import { changeMenuItemLabel } from './appMenu'
 import { getUserConfig, updateUserConfigSettings } from './config'
 import { ipcSenders } from './ipcHandlers'
 import { getWebRequestManager } from './webRequestManager'
+import { polyfillSessionPreloadAPI } from './sessionPreloadPolyfill'
 
 let blocker: ElectronBlocker | null = null
 
@@ -35,7 +36,7 @@ export function setAdblockerState(partition: string, state: boolean): void {
   if (!blocker) return
 
   const webRequestManager = getWebRequestManager()
-  const targetSession = session.fromPartition(partition)
+  const targetSession = polyfillSessionPreloadAPI(session.fromPartition(partition))
 
   if (state) {
     if (!blocker.isBlockingEnabled(targetSession)) {

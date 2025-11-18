@@ -407,7 +407,9 @@ export class AIChat {
         resourceIds: opts?.resourceIds,
         inlineImages: opts?.inlineImages,
         general: opts?.general,
-        appCreation: opts?.appCreation
+        appCreation: opts?.appCreation,
+        websearch: opts?.websearch,
+        surflet: opts?.surflet
       })
     }
 

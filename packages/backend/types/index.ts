@@ -31,6 +31,8 @@ export type Message = {
   content: MessageContent[]
 }
 
+export type ToolHandler = (...args: any[]) => any
+
 export interface CreateChatCompletionOptions {
   messages: Message[]
   model: Model

@@ -67,6 +67,8 @@ pub struct ContextMessage {
     pub page: Option<u32>,
     pub description: Option<String>,
     pub created_at: Option<String>,
+    pub timestamp: Option<String>,
+    pub resource_text_content_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -139,6 +141,16 @@ impl Message {
         let content_str = format!("working user document:\n{}", content);
         Message {
             role: MessageRole::User,
+            content: vec![MessageContent::new_text(content_str)],
+            truncatable: false,
+            is_context: false,
+        }
+    }
+
+    pub fn new_tool(name: &str, status: &str) -> Message {
+        let content_str = format!("Tool: {}\nStatus: {}", name, status);
+        Message {
+            role: MessageRole::Tool,
             content: vec![MessageContent::new_text(content_str)],
             truncatable: false,
             is_context: false,

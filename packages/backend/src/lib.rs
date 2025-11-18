@@ -35,6 +35,8 @@ pub enum BackendError {
     LLMClientErrorQuotasDepleted { quotas: serde_json::Value },
     #[error("RAG Empty Context error: {0}")]
     RAGEmptyContextError(String),
+    #[error("Cancelled error")]
+    CancelledError,
     #[error("Generic error: {0}")]
     GenericError(String),
     #[error("Multiple errors: {0:#?}")]

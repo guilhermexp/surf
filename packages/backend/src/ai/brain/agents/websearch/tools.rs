@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use crate::ai::brain::agents::io::StatusMessage;
 use crate::ai::brain::agents::{AgentIO, ContextManager, Tool};
-use crate::ai::brain::js_tools::{JSToolRegistry, ToolName};
+use crate::ai::brain::js_tools::{tool_ids, JSToolRegistry};
 use crate::ai::llm::client::{CancellationToken, Model};
 use crate::BackendResult;
 
@@ -34,7 +34,8 @@ impl SearchEngineCaller {
 #[derive(serde::Deserialize)]
 pub struct SearchArgs {
     query: String,
-    max_results: Option<u32>,
+    #[serde(rename = "max_results")]
+    _max_results: Option<u32>,
 }
 
 #[allow(dead_code)]
@@ -97,7 +98,7 @@ impl Tool for SearchEngineCaller {
         // _result mainly to tell `excute_tool` how to parse the result
         let results: Vec<SearchEngineResult> = self
             .js_tool_registry
-            .execute_tool(&ToolName::SearchDoneCallback, Some(vec![query]))?;
+            .execute_tool(tool_ids::WEB_SEARCH_DONE_CALLBACK, Some(vec![query]))?;
 
         for result in results {
             if let Some(url) = result.url {

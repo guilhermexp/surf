@@ -17,6 +17,7 @@
   import TeletypeDefaultActionPicker from './components/TeletypeDefaultActionPicker.svelte'
   import AppStylePicker from './components/AppStylePicker.svelte'
   import ModelSettings, { type ModelUpdate } from './components/ModelSettings.svelte'
+  import MCPSettings from './components/MCPSettings.svelte'
   import { BUILT_IN_MODELS, DEFAULT_AI_MODEL, Provider, type Model } from '@deta/types/src/ai.types'
   import { openDialog, prepareContextMenu } from '@deta/ui'
   import SmartNotesOptions from './components/SmartNotesOptions.svelte'
@@ -373,6 +374,9 @@
             on:delete-model={handleDeleteModel}
           />
         {/if}
+
+        <!-- MCP Server Configuration -->
+        <MCPSettings />
       </article>
       <!-- {:else if $activeTab === 'appearance'}
       <article class="general">

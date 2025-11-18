@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "svelte": "src/lib/index.ts",
+  "svelte": "./src/lib/index.ts",
   "main": "src/lib/index.ts",
   "exports": {
     ".": {
@@ -98,6 +98,9 @@
     "./package.json": "./package.json"
   },
   "sideEffects": false,
+  "peerDependencies": {
+    "svelte": "^5.38.1"
+  },
   "files": [
     "dist",
     "src/"

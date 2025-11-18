@@ -60,6 +60,15 @@ export function initDownloadManager(partition: string) {
       return
     }
 
+    // Helper to safely send to webContents
+    const safeSendToWebContents = <T>(event: any, payload: T) => {
+      if (!webContents.isDestroyed()) {
+        event.sendToWebContents(webContents, payload)
+      } else {
+        log.warn('WebContents destroyed, skipping IPC send')
+      }
+    }
+
     if (sourceIsPDFViewer) {
       log.debug('source is PDF viewer, skipping resource creation')
 
@@ -125,7 +134,7 @@ export function initDownloadManager(partition: string) {
         path = tempDownloadPath
       }
 
-      IPC_EVENTS_MAIN.downloadDone.sendToWebContents(webContents, {
+      safeSendToWebContents(IPC_EVENTS_MAIN.downloadDone, {
         id: downloadId,
         state: state,
         filename: downloadItem.getFilename(),
@@ -175,7 +184,7 @@ export function initDownloadManager(partition: string) {
               log.error(`error deleting temp file: ${err}`)
             }
 
-            IPC_EVENTS_MAIN.downloadDone.sendToWebContents(webContents, {
+            safeSendToWebContents(IPC_EVENTS_MAIN.downloadDone, {
               id: downloadId,
               state: 'cancelled',
               filename: downloadItem.getFilename(),
@@ -211,7 +220,7 @@ export function initDownloadManager(partition: string) {
       }
     )
 
-    IPC_EVENTS_MAIN.downloadRequest.sendToWebContents(webContents, {
+    safeSendToWebContents(IPC_EVENTS_MAIN.downloadRequest, {
       id: downloadId,
       url: url,
       filename: filename,
@@ -231,7 +240,7 @@ export function initDownloadManager(partition: string) {
         downloadItem.getTotalBytes()
       )
 
-      IPC_EVENTS_MAIN.downloadUpdated.sendToWebContents(webContents, {
+      safeSendToWebContents(IPC_EVENTS_MAIN.downloadUpdated, {
         id: downloadId,
         state: state,
         receivedBytes: downloadItem.getReceivedBytes(),

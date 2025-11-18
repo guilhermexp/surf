@@ -31,13 +31,16 @@
     "dist",
     "src"
   ],
+  "peerDependencies": {
+    "svelte": "^5.38.1"
+  },
   "scripts": {
-    "dev": "node ./scripts/build-tokens.mjs && svelte-package --watch",
-    "tokens:build": "node ./scripts/build-tokens.mjs",
-    "build": "svelte-kit sync && node ./scripts/build-tokens.mjs && svelte-package",
+    "dev": "BROWSERSLIST_IGNORE_OLD_DATA=1 node ./scripts/build-tokens.mjs && BROWSERSLIST_IGNORE_OLD_DATA=1 svelte-package --watch",
+    "tokens:build": "BROWSERSLIST_IGNORE_OLD_DATA=1 node ./scripts/build-tokens.mjs",
+    "build": "BROWSERSLIST_IGNORE_OLD_DATA=1 svelte-kit sync && BROWSERSLIST_IGNORE_OLD_DATA=1 node ./scripts/build-tokens.mjs && BROWSERSLIST_IGNORE_OLD_DATA=1 svelte-package",
     "build:types": "tsc --emitDeclarationOnly",
-    "dev:tailwind": "yarn run tailwindcss -i ./src/app.css -o ./src/output.css --watch --minify",
-    "build:tailwind": "yarn run tailwindcss -i ./src/app.css -o ./src/output.css --minify",
+    "dev:tailwind": "BROWSERSLIST_IGNORE_OLD_DATA=1 yarn run tailwindcss -i ./src/app.css -o ./src/output.css --watch --minify",
+    "build:tailwind": "BROWSERSLIST_IGNORE_OLD_DATA=1 yarn run tailwindcss -i ./src/app.css -o ./src/output.css --minify",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "package": "svelte-package",

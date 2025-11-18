@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import debug from 'debug'
 import { isDev } from '../system/system'
+import { getRuntimeEnvString } from '../system/runtimeEnv'
 
 const GLOBAL_SCOPE = 'SurfLogger'
 
@@ -32,7 +33,7 @@ class Logger {
   logger: any
 
   constructor(scope?: string) {
-    const enabledScopes = import.meta.env.R_VITE_DEBUG
+    const enabledScopes = getRuntimeEnvString('R_VITE_DEBUG')
     this.scope = scope || (isBrowser() ? 'Browser' : 'Node')
     // for surf only namespacing
     if (this.scope !== GLOBAL_SCOPE) {

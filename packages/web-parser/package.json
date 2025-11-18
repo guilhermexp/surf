@@ -2,8 +2,23 @@
   "name": "@deta/web-parser",
   "private": true,
   "version": "0.0.0",
-  "svelte": "src/index.ts",
-  "main": "src/index.ts",
+  "type": "module",
+  "svelte": "./src/index.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "svelte": "./src/index.ts",
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./src/*": "./src/*"
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "svelte": "^5.38.1"
+  },
   "scripts": {
     "build": "tsc",
     "build:types": "tsc --emitDeclarationOnly"

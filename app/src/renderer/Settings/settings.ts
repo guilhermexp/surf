@@ -8,6 +8,9 @@ import '@deta/ui/src/app.css'
 import Settings from './Settings.svelte'
 import { mount } from 'svelte'
 import { initLocalization, SUPPORTED_LOCALES } from '../Core/i18n'
+import { registerRuntimeEnv } from '@deta/utils/system/runtimeEnv'
+
+registerRuntimeEnv(import.meta.env)
 
 /*
 import * as Sentry from '@sentry/electron/renderer'

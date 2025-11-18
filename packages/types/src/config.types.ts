@@ -41,6 +41,14 @@ export type UserSettings = {
   sync_auth_token?: string
   selected_model: string
   model_settings: Model[]
+  mcp_servers?: Array<{
+    id: string
+    name: string
+    command: string
+    args?: string[]
+    env?: Record<string, string>
+    enabled: boolean
+  }>
   vision_image_tagging: boolean
   turntable_favicons: boolean
   auto_toggle_pip: boolean

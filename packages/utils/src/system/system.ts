@@ -1,18 +1,19 @@
 import { RendererType } from '@deta/types'
+import { getRuntimeEnvBoolean, resolvePlatform } from './runtimeEnv'
 
 export const isMac = () => {
-  return import.meta.env.PLATFORM === 'darwin'
+  return resolvePlatform() === 'darwin'
 }
 
 export const isWindows = () => {
-  return import.meta.env.PLATFORM === 'win32'
+  return resolvePlatform() === 'win32'
 }
 
 export const isLinux = () => {
-  return import.meta.env.PLATFORM === 'linux'
+  return resolvePlatform() === 'linux'
 }
 
-export const isDev = import.meta.env.DEV
+export const isDev = getRuntimeEnvBoolean('DEV', false)
 
 export const isOffline = () => {
   return !navigator.onLine

@@ -26,7 +26,8 @@ export enum BuiltInModelIDs {
   ClaudeCodeAgent = 'claude-code-agent',
   ClaudeCodeAgentSonnet45 = 'claude-sonnet-4-5-20250929',
   ClaudeCodeAgentHaiku45 = 'claude-haiku-4-5-20251001',
-  Gemini2Flash = 'gemini-2.0-flash'
+  Gemini2Flash = 'gemini-2.0-flash',
+  Gemini25ComputerUse = 'gemini-2.5-computer-use-preview-10-2025'
 }
 
 export enum ModelTiers {
@@ -192,7 +193,8 @@ export const BuiltInModelLabels = {
   [BuiltInModelIDs.ClaudeCodeAgent]: 'Claude Code Agent (Auto)',
   [BuiltInModelIDs.ClaudeCodeAgentSonnet45]: 'Claude Code Agent Sonnet 4.5',
   [BuiltInModelIDs.ClaudeCodeAgentHaiku45]: 'Claude Code Agent Haiku 4.5',
-  [BuiltInModelIDs.Gemini2Flash]: 'Gemini 2.0 Flash'
+  [BuiltInModelIDs.Gemini2Flash]: 'Gemini 2.0 Flash',
+  [BuiltInModelIDs.Gemini25ComputerUse]: 'Gemini 2.5 Computer Use'
 }
 
 export const ProviderLabels = {
@@ -373,6 +375,15 @@ export const BUILT_IN_MODELS = [
     tier: ModelTiers.Standard,
     icon: ProviderIcons[Provider.Google],
     supports_json_format: true,
+    vision: true
+  },
+  {
+    id: BuiltInModelIDs.Gemini25ComputerUse,
+    label: BuiltInModelLabels[BuiltInModelIDs.Gemini25ComputerUse],
+    provider: Provider.Google,
+    tier: ModelTiers.Premium,
+    icon: ProviderIcons[Provider.Google],
+    supports_json_format: false,
     vision: true
   }
 ] as Model[]

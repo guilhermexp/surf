@@ -38,6 +38,23 @@ pub fn extract_youtube_video_id(url: &str) -> Option<String> {
     None
 }
 
+/// Checks if a given URL is a valid YouTube video URL.
+/// Returns true if the URL can be parsed as a YouTube video link.
+///
+/// # Examples
+///
+/// ```
+/// use crate::ai::youtube::is_youtube_video_url;
+///
+/// assert!(is_youtube_video_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+/// assert!(is_youtube_video_url("https://youtu.be/dQw4w9WgXcQ"));
+/// assert!(is_youtube_video_url("https://www.youtube.com/embed/dQw4w9WgXcQ"));
+/// assert!(!is_youtube_video_url("https://www.example.com"));
+/// ```
+pub fn is_youtube_video_url(url: &str) -> bool {
+    extract_youtube_video_id(url).is_some()
+}
+
 pub fn fetch_transcript(
     video_url: &str,
     preferred_lang: Option<&str>,

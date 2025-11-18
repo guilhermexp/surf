@@ -7,6 +7,9 @@ import '@deta/ui/src/output.css'
 import '@deta/ui/src/app.css'
 import Resource from './Resource.svelte'
 import { mount } from 'svelte'
+import { registerRuntimeEnv } from '@deta/utils/system/runtimeEnv'
+
+registerRuntimeEnv(import.meta.env)
 
 /*
 import * as Sentry from '@sentry/electron/renderer'

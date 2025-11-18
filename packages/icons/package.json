@@ -19,6 +19,9 @@
     "dist",
     "src/lib"
   ],
+  "peerDependencies": {
+    "svelte": "^5.38.1"
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",

@@ -30,6 +30,7 @@ import {
 } from '@deta/types'
 import { ContextManagerWCV } from './contextManagerWCV'
 import { useNotebookManager } from '../notebooks'
+import { registerAITools } from './tools/manifest'
 
 export interface AppCreationResult {
   appId: string
@@ -80,6 +81,9 @@ export class AIService {
     this.sffs = resourceManager.sffs
     this.config = config
     this.log = useLogScope('AI')
+    registerAITools(this.sffs).catch((error) =>
+      this.log.error('Failed to register AI tools', error)
+    )
 
     if (global) {
       const tabsManager = useTabs()

@@ -10,36 +10,23 @@ use crate::ai::brain::agents::{Agent, AgentConfig, ExecuteConfig};
 use crate::ai::brain::js_tools::JSToolRegistry;
 use crate::ai::brain::prompts::{current_time_prompt, lead_agent_prompt};
 use crate::ai::brain::tools::ContextManagementTool;
-use crate::ai::llm::client::{CancellationToken, LLMClient, Model};
+use crate::ai::llm::client::{CancellationToken, LLMClient};
 use crate::{BackendError, BackendResult};
 
 use super::tools::SurfletAgentTool;
 
 #[allow(dead_code)]
 pub struct Orchestrator {
-    api_base: String,
-    api_key: String,
     llm_client: Arc<LLMClient>,
-    model: Model,
     lead_agent: Option<Agent>,
     js_tool_registry: Arc<JSToolRegistry>,
 }
 
 impl Orchestrator {
     pub fn new(
-        api_base: String,
-        api_key: String,
-        default_model: Model,
+        llm_client: Arc<LLMClient>,
         js_tool_registry: Arc<JSToolRegistry>,
     ) -> BackendResult<Self> {
-        let llm_client = LLMClient::new(api_base.clone(), api_key.clone()).map_err(|e| {
-            BackendError::GenericError(
-                format!("failed to create new llm client: {:?}", e).to_string(),
-            )
-        })?;
-
-        let llm_client = Arc::new(llm_client);
-
         let lead_config = AgentConfig {
             name: "Lead Agent".to_string(),
             max_iterations: 10,
@@ -51,9 +38,6 @@ impl Orchestrator {
         };
         let lead_agent = Agent::new(llm_client.clone(), lead_config);
         let mut orc = Self {
-            api_base,
-            api_key,
-            model: default_model,
             llm_client,
             lead_agent: Some(lead_agent),
             js_tool_registry,

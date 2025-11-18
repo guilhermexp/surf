@@ -9,33 +9,18 @@ use neon::{
 };
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::str::FromStr;
 use std::sync::{Arc, Mutex, RwLock};
 
 use crate::{BackendError, BackendResult};
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub enum ToolName {
-    SearchAPI,
-    SearchDoneCallback,
-    SurfletDoneCallback,
-    ScrapeURL,
-}
-
-impl FromStr for ToolName {
-    type Err = BackendError;
-    fn from_str(s: &str) -> BackendResult<Self> {
-        match s {
-            "web_search_api" => Ok(ToolName::SearchAPI),
-            "web_search_done_callback" => Ok(ToolName::SearchDoneCallback),
-            "scrape_url" => Ok(ToolName::ScrapeURL),
-            "surflet_done_callback" => Ok(ToolName::SurfletDoneCallback),
-            _ => Err(BackendError::GenericError(format!(
-                "Unexpected tool name: {}",
-                s
-            ))),
-        }
-    }
+pub mod tool_ids {
+    pub const WEB_SEARCH_API: &str = "web_search_api";
+    pub const WEB_SEARCH_DONE_CALLBACK: &str = "web_search_done_callback";
+    pub const SCRAPE_URL: &str = "scrape_url";
+    pub const SURFLET_DONE_CALLBACK: &str = "surflet_done_callback";
+    pub const IMAGE_GENERATE: &str = "image_generate";
+    pub const VIDEO_GENERATE: &str = "video_generate";
+    pub const BROWSER_CONTROL: &str = "browser_control";
 }
 
 pub struct ToolEntry {
@@ -45,7 +30,7 @@ pub struct ToolEntry {
 
 #[derive(Clone)]
 pub struct JSToolRegistry {
-    tools: Arc<RwLock<HashMap<ToolName, ToolEntry>>>,
+    tools: Arc<RwLock<HashMap<String, ToolEntry>>>,
 }
 
 impl Default for JSToolRegistry {
@@ -63,7 +48,7 @@ impl JSToolRegistry {
 
     pub fn add_tool(
         &self,
-        tool_name: ToolName,
+        tool_id: impl Into<String>,
         js_function: Root<JsFunction>,
         channel: Channel,
     ) -> BackendResult<()> {
@@ -76,19 +61,19 @@ impl JSToolRegistry {
             channel,
         };
 
-        tools.insert(tool_name, tool_entry);
+        tools.insert(tool_id.into(), tool_entry);
         Ok(())
     }
 
-    pub fn remove_tool(&self, tool_name: &ToolName) -> BackendResult<bool> {
+    pub fn remove_tool(&self, tool_id: &str) -> BackendResult<bool> {
         let mut tools = self.tools.write().map_err(|_| {
             BackendError::GenericError("Failed to acquire write lock on tool registry".to_string())
         })?;
 
-        Ok(tools.remove(tool_name).is_some())
+        Ok(tools.remove(tool_id).is_some())
     }
 
-    pub fn execute_tool<T, R>(&self, tool_name: &ToolName, args: Option<Vec<T>>) -> BackendResult<R>
+    pub fn execute_tool<T, R>(&self, tool_id: &str, args: Option<Vec<T>>) -> BackendResult<R>
     where
         T: Send + 'static,
         for<'cx> T: TryIntoJs<'cx>,
@@ -101,12 +86,12 @@ impl JSToolRegistry {
                 )
             })?;
 
-            match tools.get(tool_name) {
+            match tools.get(tool_id) {
                 Some(entry) => (Arc::clone(&entry.callback), entry.channel.clone()),
                 None => {
                     return Err(BackendError::GenericError(format!(
-                        "Tool {:?} not found",
-                        tool_name
+                        "Tool '{}' not found",
+                        tool_id
                     )))
                 }
             }
@@ -225,9 +210,9 @@ impl JSToolRegistry {
         }
     }
 
-    pub fn has_tool(&self, tool_name: &ToolName) -> bool {
+    pub fn has_tool(&self, tool_id: &str) -> bool {
         if let Ok(tools) = self.tools.read() {
-            tools.contains_key(tool_name)
+            tools.contains_key(tool_id)
         } else {
             false
         }

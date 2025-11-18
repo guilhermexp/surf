@@ -2,7 +2,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 use crate::ai::brain::agents::{AgentIO, ContextManager, Tool};
-use crate::ai::brain::js_tools::{JSToolRegistry, ToolName};
+use crate::ai::brain::js_tools::{tool_ids, JSToolRegistry};
 use crate::ai::llm::client::{CancellationToken, Model};
 use crate::BackendResult;
 
@@ -36,7 +36,8 @@ pub struct SurfletArgs {
 
 #[derive(serde::Deserialize)]
 pub struct SurfletDoneCallbackResult {
-    status: String,
+    #[serde(rename = "status")]
+    _status: String,
 }
 
 impl Tool for SurfletCreator {
@@ -90,7 +91,7 @@ impl Tool for SurfletCreator {
         // _result mainly to tell `execute_tool` how to parse the result, we can ignore
         let _result: SurfletDoneCallbackResult = self
             .js_tool_registry
-            .execute_tool(&ToolName::SurfletDoneCallback, Some(vec![name, prompt]))?;
+            .execute_tool(tool_ids::SURFLET_DONE_CALLBACK, Some(vec![name, prompt]))?;
 
         Ok(())
     }

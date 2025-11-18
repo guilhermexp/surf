@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::VecDeque,
     io::{BufRead, BufReader},
+    sync::{atomic::AtomicBool, atomic::Ordering, Arc},
     time::{Duration, Instant},
 };
 
@@ -14,12 +15,81 @@ use crate::{
     BackendError, BackendResult,
 };
 
+/// A token that can be used to cancel an ongoing operation.
+/// Thread-safe and can be cloned and shared across threads.
+#[derive(Clone, Default)]
+pub struct CancellationToken {
+    cancelled: Arc<AtomicBool>,
+}
+
+impl CancellationToken {
+    /// Creates a new cancellation token.
+    pub fn new() -> Self {
+        Self {
+            cancelled: Arc::new(AtomicBool::new(false)),
+        }
+    }
+
+    /// Signals that the operation should be cancelled.
+    pub fn cancel(&self) {
+        self.cancelled.store(true, Ordering::SeqCst);
+    }
+
+    /// Checks if the operation has been cancelled.
+    pub fn is_cancelled(&self) -> bool {
+        self.cancelled.load(Ordering::SeqCst)
+    }
+}
+
+/// Trait for providers that can generate chat completions.
+/// Implementations must be thread-safe (Send + Sync).
+pub trait ChatCompletionProvider: Send + Sync {
+    /// Creates a non-streaming chat completion.
+    ///
+    /// # Arguments
+    /// * `messages` - The conversation history
+    /// * `model` - The model to use for completion
+    /// * `custom_key` - Optional custom API key
+    /// * `response_format` - Optional JSON schema for structured output
+    ///
+    /// # Returns
+    /// The complete response as a string
+    fn create_chat_completion(
+        &self,
+        messages: Vec<Message>,
+        model: &Model,
+        custom_key: Option<String>,
+        response_format: Option<serde_json::Value>,
+    ) -> BackendResult<String>;
+
+    /// Creates a streaming chat completion.
+    ///
+    /// # Arguments
+    /// * `messages` - The conversation history
+    /// * `model` - The model to use for completion
+    /// * `custom_key` - Optional custom API key
+    /// * `response_format` - Optional JSON schema for structured output
+    /// * `cancellation_token` - Token to signal cancellation of the stream
+    ///
+    /// # Returns
+    /// A stream of response chunks
+    fn create_streaming_chat_completion(
+        &self,
+        messages: Vec<Message>,
+        model: &Model,
+        custom_key: Option<String>,
+        response_format: Option<serde_json::Value>,
+        cancellation_token: CancellationToken,
+    ) -> BackendResult<ChatCompletionStream>;
+}
+
 pub struct ChatCompletionStream {
     reader: StreamReader,
     buffer: String,
     provider: Provider,
     last_update: Instant,
     update_interval: Duration,
+    cancellation_token: CancellationToken,
 }
 
 enum StreamReader {
@@ -218,17 +288,27 @@ fn truncate_messages(messages: Vec<Message>, model: &Model) -> Vec<Message> {
 }
 
 impl ChatCompletionStream {
-    fn new(reader: BufReader<Response>, provider: Provider, packets_per_second: u32) -> Self {
+    fn new(
+        reader: BufReader<Response>,
+        provider: Provider,
+        packets_per_second: u32,
+        cancellation_token: CancellationToken,
+    ) -> Self {
         Self {
             reader: StreamReader::Http(reader),
             buffer: String::new(),
             provider,
             last_update: Instant::now(),
             update_interval: Duration::from_secs_f64(1.0 / packets_per_second as f64),
+            cancellation_token,
         }
     }
 
-    fn from_single_chunk(chunk: BackendResult<String>, provider: Provider) -> Self {
+    fn from_single_chunk(
+        chunk: BackendResult<String>,
+        provider: Provider,
+        cancellation_token: CancellationToken,
+    ) -> Self {
         let mut queue = VecDeque::new();
         queue.push_back(chunk);
         Self {
@@ -237,6 +317,7 @@ impl ChatCompletionStream {
             provider,
             last_update: Instant::now(),
             update_interval: Duration::from_secs(0),
+            cancellation_token,
         }
     }
 
@@ -624,6 +705,11 @@ impl Iterator for ChatCompletionStream {
     type Item = BackendResult<String>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // Check for cancellation before processing
+        if self.cancellation_token.is_cancelled() {
+            return None;
+        }
+
         match &mut self.reader {
             StreamReader::Custom(queue) => queue.pop_front(),
             StreamReader::Http(reader) => {
@@ -632,6 +718,11 @@ impl Iterator for ChatCompletionStream {
                 match reader.read_line(&mut self.buffer) {
                     Ok(0) => None,
                     Ok(_) => {
+                        // Check for cancellation after reading
+                        if self.cancellation_token.is_cancelled() {
+                            return None;
+                        }
+
                         self.buffer = self.buffer.trim().to_string();
                         if self.buffer.is_empty() {
                             return self.next();
@@ -714,13 +805,14 @@ impl LLMClient {
         self.handle_completion_response(response, provider, response_format.is_some())
     }
 
-    #[tracing::instrument(level = "trace", skip(self, messages, response_format))]
+    #[tracing::instrument(level = "trace", skip(self, messages, response_format, cancellation_token))]
     pub fn create_streaming_chat_completion(
         &self,
         messages: Vec<Message>,
         model: &Model,
         custom_key: Option<String>,
         response_format: Option<serde_json::Value>,
+        cancellation_token: CancellationToken,
     ) -> BackendResult<ChatCompletionStream> {
         tracing::info!(
             "[LLM Client] create_streaming_chat_completion called with model: {:?}",
@@ -743,6 +835,7 @@ impl LLMClient {
             return Ok(ChatCompletionStream::from_single_chunk(
                 Ok(output),
                 Provider::ClaudeAgent,
+                cancellation_token,
             ));
         }
 
@@ -754,7 +847,7 @@ impl LLMClient {
             true,
         )?;
 
-        self.handle_streaming_response(response, model.provider())
+        self.handle_streaming_response(response, model.provider(), cancellation_token)
     }
 
     fn send_completion_request(
@@ -838,11 +931,13 @@ impl LLMClient {
         &self,
         response: Response,
         provider: &Provider,
+        cancellation_token: CancellationToken,
     ) -> BackendResult<ChatCompletionStream> {
         Ok(ChatCompletionStream::new(
             BufReader::new(response),
             provider.clone(),
             120,
+            cancellation_token,
         ))
     }
 
@@ -891,5 +986,38 @@ impl LLMClient {
         }
 
         result
+    }
+}
+
+/// Implementation of the ChatCompletionProvider trait for LLMClient.
+/// This allows LLMClient to be used polymorphically with other providers.
+impl ChatCompletionProvider for LLMClient {
+    fn create_chat_completion(
+        &self,
+        messages: Vec<Message>,
+        model: &Model,
+        custom_key: Option<String>,
+        response_format: Option<serde_json::Value>,
+    ) -> BackendResult<String> {
+        // Delegate to the existing method
+        self.create_chat_completion(messages, model, custom_key, response_format)
+    }
+
+    fn create_streaming_chat_completion(
+        &self,
+        messages: Vec<Message>,
+        model: &Model,
+        custom_key: Option<String>,
+        response_format: Option<serde_json::Value>,
+        cancellation_token: CancellationToken,
+    ) -> BackendResult<ChatCompletionStream> {
+        // Delegate to the existing method
+        self.create_streaming_chat_completion(
+            messages,
+            model,
+            custom_key,
+            response_format,
+            cancellation_token,
+        )
     }
 }

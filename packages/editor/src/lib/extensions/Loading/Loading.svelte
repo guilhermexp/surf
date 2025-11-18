@@ -12,6 +12,7 @@
 </div>
 
 <style lang="scss">
+  @use 'sass:math';
   .loading {
     width: fit-content;
     display: inline-flex;
@@ -102,8 +103,8 @@
 
   @keyframes multiSlide {
     // Calculate animation vs idle percentages
-    $animation-percent: percentage($total-duration / ($total-duration + $idle-delay));
-    $idle-percent: percentage($idle-delay / ($total-duration + $idle-delay));
+    $animation-percent: math.percentage(math.div($total-duration, $total-duration + $idle-delay));
+    $idle-percent: math.percentage(math.div($idle-delay, $total-duration + $idle-delay));
 
     0% {
       background-position:

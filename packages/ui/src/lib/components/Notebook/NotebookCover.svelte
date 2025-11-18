@@ -280,62 +280,56 @@
     height: var(--height);
     aspect-ratio: 7 / 11;
     aspect-ratio: 7.5 / 11;
-    &::selection {
-      background: var(--color-text);
-      color: var(--color-start-fallback);
-      @supports (color: color(display-p3 1 0.4 0.2)) {
-        color: var(--color-start);
-      }
-    }
-
-  --rounded-base: var(--round-base, 12px);
-  --rounded-diff: var(--round-diff, -8px);
-  --rounded-left: calc(var(--rounded-base) + var(--rounded-diff));
-
-  border-top-left-radius: var(--rounded-left);
-  border-bottom-left-radius: var(--rounded-left);
-  border-top-right-radius: var(--rounded-base);
-  border-bottom-right-radius: var(--rounded-base);
-  overflow: hidden;
-  transition:
-    transform 123ms ease-out,
-    box-shadow 123ms ease-out;
-
-
-  &.canClick {
-    &:hover,
-    &:global([data-context-menu-anchor]) {
-      transform: scale(1.01) rotate3d(1, 2, 4, 0.5deg);
-      box-shadow: rgba(99, 99, 99, 0.2) 0px 4px 12px 0px;
-    }
-
-    &:active {
-      transform: scale(0.99) rotate3d(1, 2, 4, 0.2deg);
-    }
-  }
-
-   > .cover {
-    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.12)), linear-gradient(to bottom, var(--color-start-fallback), var(--color-end-fallback));
-    @supports (color: color(display-p3 1 0.4 0.2)) {
-      background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.12)), linear-gradient(to bottom, var(--color-start), var(--color-end));
-    }
-
-    height: 100%;
-    width: 100%;
-
-    box-shadow: 
-      0 0 0.2px 0 rgba(0, 0, 0, 0.18) inset, 
-      0 0.987px 3px 0 rgba(0, 0, 0, 0.1) inset, 
-      0 3px 7px 0 rgba(0, 0, 0, 0.1) inset,
-      0 -2px 2px 0 rgba(0, 0, 0, 0.1) inset, 
-      0 1px 3px 0 rgba(255, 255, 255, 0.99) inset, 
-      0 2px 4px 0 rgba(255, 255, 255, 0.25) inset;
+    --rounded-base: var(--round-base, 12px);
+    --rounded-diff: var(--round-diff, -8px);
+    --rounded-left: calc(var(--rounded-base) + var(--rounded-diff));
 
     border-top-left-radius: var(--rounded-left);
     border-bottom-left-radius: var(--rounded-left);
     border-top-right-radius: var(--rounded-base);
     border-bottom-right-radius: var(--rounded-base);
     overflow: hidden;
+    transition:
+      transform 123ms ease-out,
+      box-shadow 123ms ease-out;
+
+    &.canClick {
+      &:hover,
+      &:global([data-context-menu-anchor]) {
+        transform: scale(1.01) rotate3d(1, 2, 4, 0.5deg);
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 4px 12px 0px;
+      }
+
+    &:active {
+      transform: scale(0.99) rotate3d(1, 2, 4, 0.2deg);
+    }
+    }
+
+    > .cover {
+      background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.12)),
+        linear-gradient(to bottom, var(--color-start-fallback), var(--color-end-fallback));
+
+      height: 100%;
+      width: 100%;
+
+      box-shadow:
+        0 0 0.2px 0 rgba(0, 0, 0, 0.18) inset,
+        0 0.987px 3px 0 rgba(0, 0, 0, 0.1) inset,
+        0 3px 7px 0 rgba(0, 0, 0, 0.1) inset,
+        0 -2px 2px 0 rgba(0, 0, 0, 0.1) inset,
+        0 1px 3px 0 rgba(255, 255, 255, 0.99) inset,
+        0 2px 4px 0 rgba(255, 255, 255, 0.25) inset;
+
+      border-top-left-radius: var(--rounded-left);
+      border-bottom-left-radius: var(--rounded-left);
+      border-top-right-radius: var(--rounded-base);
+      border-bottom-right-radius: var(--rounded-base);
+      overflow: hidden;
+
+      @supports (color: color(display-p3 1 0.4 0.2)) {
+        background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.12)),
+          linear-gradient(to bottom, var(--color-start), var(--color-end));
+      }
 
     .text {
       position: absolute;
@@ -360,10 +354,10 @@
       -webkit-box-orient: vertical;
 
       color: var(--color-text-fallback);
+      padding-right: 2ch;
       @supports (color: color(display-p3 1 0.4 0.2)) {
         color: var(--color-text);
       }
-      padding-right: 2ch;
 
       &.editable {
         cursor: text;
@@ -378,8 +372,16 @@
 
       &:focus {
         outline: none;
+    }
+
+    &::selection {
+      background: var(--color-text);
+      color: var(--color-start-fallback);
+      @supports (color: color(display-p3 1 0.4 0.2)) {
+        color: var(--color-start);
       }
     }
+  }
 
     .sub-text {
       position: absolute;

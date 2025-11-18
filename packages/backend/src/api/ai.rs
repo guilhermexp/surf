@@ -16,6 +16,8 @@ pub fn register_exported_functions(cx: &mut ModuleContext) -> NeonResult<()> {
     cx.export_function("js__ai_get_docs_similarity", js_get_ai_docs_similarity)?;
     cx.export_function("js__ai_get_youtube_transcript", js_get_youtube_transcript)?;
     cx.export_function("js__ai_search_chat_resources", js_search_chat_resources)?;
+    cx.export_function("js__ai_register_tool", js_register_tool)?;
+    cx.export_function("js__ai_unregister_tool", js_unregister_tool)?;
     Ok(())
 }
 
@@ -319,6 +321,33 @@ fn js_search_chat_resources(mut cx: FunctionContext) -> JsResult<JsPromise> {
             number_documents: opts.number_documents,
             resource_ids: opts.resource_ids,
         }),
+        deferred,
+    );
+
+    Ok(promise)
+}
+
+fn js_register_tool(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let tunnel = cx.argument::<JsBox<WorkerTunnel>>(0)?;
+    let tool_id = cx.argument::<JsString>(1)?.value(&mut cx);
+    let callback = cx.argument::<JsFunction>(2)?.root(&mut cx);
+
+    let (deferred, promise) = cx.promise();
+    tunnel.worker_send_js(
+        WorkerMessage::MiscMessage(MiscMessage::RegisterTool { tool_id, callback }),
+        deferred,
+    );
+
+    Ok(promise)
+}
+
+fn js_unregister_tool(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let tunnel = cx.argument::<JsBox<WorkerTunnel>>(0)?;
+    let tool_id = cx.argument::<JsString>(1)?.value(&mut cx);
+
+    let (deferred, promise) = cx.promise();
+    tunnel.worker_send_js(
+        WorkerMessage::MiscMessage(MiscMessage::UnregisterTool { tool_id }),
         deferred,
     );
 

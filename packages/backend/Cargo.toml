@@ -49,7 +49,7 @@ mime2ext = "0.1.54"
 [dependencies.neon]
 version = "1.1.1"
 default-features = false
-features = ["napi-8", "futures"]
+features = ["napi-8", "futures", "serde"]
 
 [build-dependencies]
 pkg-config = "0.3.30"
@@ -58,4 +58,5 @@ pkg-config = "0.3.30"
 tempfile = "3.18.0"
 
 [features]
+default = ["wip"]
 wip = []

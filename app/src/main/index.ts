@@ -1,9 +1,10 @@
-import { app, BrowserWindow, protocol } from 'electron'
+import { app, BrowserWindow, protocol, session } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { readdir, unlink, stat } from 'fs/promises'
 import { join, dirname } from 'path'
 import { mkdirSync } from 'fs'
 import { isDev, isMac, isWindows } from '@deta/utils/system'
+import { registerRuntimeEnv } from '@deta/utils/system/runtimeEnv'
 import { IPC_EVENTS_MAIN } from '@deta/services/ipc'
 
 import { createWindow, getMainWindow } from './mainWindow'
@@ -18,6 +19,9 @@ import { CrashHandler } from './crashHandler'
 import { surfProtocolExternalURLHandler } from './surfProtocolHandlers'
 import { useLogScope } from '@deta/utils'
 import { initializeSFFSMain } from './sffs'
+import { polyfillSessionPreloadAPI } from './sessionPreloadPolyfill'
+
+registerRuntimeEnv(import.meta.env)
 
 const log = useLogScope('Main')
 
@@ -163,21 +167,26 @@ const setupBackendServer = async (appPath: string, backendRootPath: string, user
   surfBackendManager
     ?.on('ready', () => {
       const webContents = getMainWindow()?.webContents
-      if (webContents) IPC_EVENTS_MAIN.setSurfBackendHealth.sendToWebContents(webContents, true)
+      if (webContents && !webContents.isDestroyed()) {
+        IPC_EVENTS_MAIN.setSurfBackendHealth.sendToWebContents(webContents, true)
+      }
     })
     .on('close', () => {
       const webContents = getMainWindow()?.webContents
-      if (webContents) IPC_EVENTS_MAIN.setSurfBackendHealth.sendToWebContents(webContents, false)
+      if (webContents && !webContents.isDestroyed()) {
+        IPC_EVENTS_MAIN.setSurfBackendHealth.sendToWebContents(webContents, false)
+      }
     })
 
   IPC_EVENTS_MAIN.appReady.on(() => {
     if (surfBackendManager) {
       const webContents = getMainWindow()?.webContents
-      if (webContents)
+      if (webContents && !webContents.isDestroyed()) {
         IPC_EVENTS_MAIN.setSurfBackendHealth.sendToWebContents(
           webContents,
           surfBackendManager.isHealthy
         )
+      }
     }
   })
 
@@ -190,16 +199,38 @@ const setupBackendServer = async (appPath: string, backendRootPath: string, user
 const initializeApp = async () => {
   log.log('initilizing app', is.dev ? 'in development mode' : 'in production mode')
 
+  if (session.defaultSession) {
+    polyfillSessionPreloadAPI(session.defaultSession)
+  }
+
   isAppLaunched = true
   setInterval(cleanupTempFiles, 60 * 60 * 1000)
   electronApp.setAppUserModelId('ea.browser.deta.surf')
 
-  const appPath = app.getAppPath() + (isDev ? '' : '.unpacked')
+  // FIX: In dev mode, app.getAppPath() returns 'app.unpacked' but OCR files are in 'app/resources/ocrs/'
+  const appPath = isDev ? app.getAppPath().replace('.unpacked', '') : `${app.getAppPath()}.unpacked`
   const userDataPath = app.getPath('userData')
   const backendRootPath = join(userDataPath, 'sffs_backend')
   const userConfig = getUserConfig()
 
   setupIpc(backendRootPath)
+
+  // Initialize MCP servers
+  // DISABLED: MCP servers cause "No such file or directory" errors
+  // when commands (like 'npx') are not installed in PATH.
+  // To enable MCP servers:
+  // 1. Install required commands (e.g., npm install -g npx)
+  // 2. Configure servers in Settings → MCP Servers
+  // 3. Uncomment the code below
+  //
+  // try {
+  //   const { initializeMCP } = await import('./mcp/loader')
+  //   await initializeMCP()
+  // } catch (err) {
+  //   log.warn('Failed to initialize MCP servers:', err)
+  // }
+
+  log.info('[MCP] MCP server initialization is DISABLED. AI Tools will work normally.')
 
   if (isDev) {
     log.log('Running in development mode, setting app icon to dev icon')
@@ -284,6 +315,13 @@ const setupApplication = () => {
     })
     .on('will-quit', async () => {
       surfBackendManager?.stop()
+      // Shutdown MCP servers - DISABLED (see initialization above)
+      // try {
+      //   const { shutdownMCP } = await import('./mcp/loader')
+      //   await shutdownMCP()
+      // } catch (err) {
+      //   log.warn('Failed to shutdown MCP servers:', err)
+      // }
       await cleanupTempFiles()
     })
 

@@ -366,6 +366,98 @@ function setupIpcHandlers(backendRootPath: string) {
     window.webContents.focus()
     return true
   })
+
+  // MCP Integration handlers
+  IPC_EVENTS_MAIN.getMCPServers.handle(async (event) => {
+    if (!validateIPCSender(event)) return null
+
+    const { getMCPLoader } = await import('./mcp/loader')
+    const loader = getMCPLoader()
+    return loader.getAllServers()
+  })
+
+  IPC_EVENTS_MAIN.getMCPTools.handle(async (event) => {
+    if (!validateIPCSender(event)) return null
+
+    const { getMCPLoader } = await import('./mcp/loader')
+    const loader = getMCPLoader()
+    return loader.getAllTools()
+  })
+
+  IPC_EVENTS_MAIN.executeMCPTool.handle(async (event, payload) => {
+    if (!validateIPCSender(event)) return null
+
+    const { getMCPLoader } = await import('./mcp/loader')
+    const loader = getMCPLoader()
+    return loader.executeToolCall(payload)
+  })
+
+  IPC_EVENTS_MAIN.getMCPTelemetry.handle(async (event) => {
+    if (!validateIPCSender(event)) return null
+
+    const { getMCPLoader } = await import('./mcp/loader')
+    const loader = getMCPLoader()
+    return loader.getTelemetryStats()
+  })
+
+  IPC_EVENTS_MAIN.getMCPConfigs.handle(async (event) => {
+    if (!validateIPCSender(event)) return null
+
+    const { loadMCPConfig } = await import('./mcp/loader')
+    return loadMCPConfig()
+  })
+
+  IPC_EVENTS_MAIN.addMCPServer.handle(async (event, payload) => {
+    if (!validateIPCSender(event)) return { success: false, error: 'Invalid sender' }
+
+    try {
+      const { updateMCPServer } = await import('./mcp/loader')
+      updateMCPServer(payload)
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      }
+    }
+  })
+
+  IPC_EVENTS_MAIN.updateMCPServer.handle(async (event, payload) => {
+    if (!validateIPCSender(event)) return { success: false, error: 'Invalid sender' }
+
+    try {
+      const { updateMCPServer } = await import('./mcp/loader')
+      updateMCPServer(payload)
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      }
+    }
+  })
+
+  IPC_EVENTS_MAIN.deleteMCPServer.handle(async (event, payload) => {
+    if (!validateIPCSender(event)) return { success: false, error: 'Invalid sender' }
+
+    try {
+      const { deleteMCPServer, getMCPLoader } = await import('./mcp/loader')
+      const loader = getMCPLoader()
+
+      // Stop the server if it's running
+      await loader.stopServer(payload.serverId)
+
+      // Delete the config
+      deleteMCPServer(payload.serverId)
+
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      }
+    }
+  })
 }
 
 export const ipcSenders = {

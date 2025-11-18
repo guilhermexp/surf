@@ -2,7 +2,7 @@
   "name": "horizon",
   "private": true,
   "scripts": {
-    "dev": "CHOKIDAR_USEPOLLING=true turbo run desktop#dev",
+    "dev": "BROWSERSLIST_IGNORE_OLD_DATA=1 CHOKIDAR_USEPOLLING=true turbo run desktop#dev",
     "dev:silent": "SILENCE_WARNINGS=true yarn run dev",
     "dev:all": "turbo dev",
     "build": "turbo run desktop#build",

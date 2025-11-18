@@ -1389,6 +1389,8 @@ dependencies = [
  "once_cell",
  "semver",
  "send_wrapper",
+ "serde",
+ "serde_json",
  "smallvec",
  "tokio",
 ]

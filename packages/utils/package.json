@@ -35,6 +35,10 @@
       "types": "./dist/system/index.d.ts",
       "import": "./dist/system/index.js"
     },
+    "./system/runtimeEnv": {
+      "types": "./dist/system/runtimeEnv.d.ts",
+      "import": "./dist/system/runtimeEnv.js"
+    },
     "./src/*": "./src/*",
     "./dist/*": "./dist/*"
   },

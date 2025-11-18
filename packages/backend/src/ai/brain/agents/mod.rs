@@ -10,9 +10,7 @@ use tools::{FunctionCall, Tool, ToolCall, ToolResult};
 
 use quick_xml::events::Event;
 use quick_xml::reader::Reader;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use tracing::instrument::WithSubscriber;
 
 use crate::ai::brain::agents::context::ContextManager;
 use crate::ai::brain::agents::io::StatusMessage;
@@ -24,12 +22,6 @@ use crate::BackendResult;
 use crate::{ai::llm::models::Message, BackendError};
 
 use std::collections::{HashMap, HashSet};
-
-#[derive(Debug, Serialize, Deserialize)]
-struct ToolCallRequest {
-    name: String,
-    parameters: serde_json::Value,
-}
 
 #[derive(Debug)]
 enum LLMResponse {
@@ -182,7 +174,7 @@ impl Agent {
             let stream = self.client.create_streaming_chat_completion(
                 messages,
                 &config.model,
-                config.custom_key.as_deref(),
+                config.custom_key.clone(),
                 None, // No response format needed for XML
                 cancellation_token.clone(),
             )?;

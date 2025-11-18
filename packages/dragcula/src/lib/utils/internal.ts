@@ -1,11 +1,41 @@
 import { DragZone, HTMLDragArea } from "$lib/index.js";
 
+const runtimeEnv = (() => {
+  const globalEnv = (globalThis as any).__SURF_RUNTIME_ENV__;
+  if (globalEnv && typeof globalEnv === "object") {
+    return globalEnv;
+  }
+  return undefined;
+})();
+
+const readEnv = (key: string): string | undefined => {
+  const value = runtimeEnv?.[key];
+  if (typeof value === "string") return value;
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof process !== "undefined" && process.env && process.env[key]) {
+    return process.env[key];
+  }
+  return undefined;
+};
+
+const readFlag = (key: string, fallback: boolean) => {
+  const value = readEnv(key);
+  if (typeof value === "string") {
+    if (value.toLowerCase() === "true") return true;
+    if (value.toLowerCase() === "false") return false;
+  }
+  return fallback;
+};
+
 /// === FEATURES
 export const SUPPORTS_VIEW_TRANSITIONS = document.startViewTransition !== undefined;
 
 /// === LOGGING
-export const DEV = import.meta.env.DEV;
-const VITE_LOG_LEVEL = import.meta.env.R_VITE_LOG_LEVEL;
+export const DEV = readFlag(
+  "DEV",
+  typeof process !== "undefined" ? process.env.NODE_ENV !== "production" : false
+);
+const VITE_LOG_LEVEL = readEnv("R_VITE_LOG_LEVEL");
 const logLevels = ["trace", "debug", "info", "warn", "error"];
 export const LOG_LEVEL =
   DEV === true ? logLevels.indexOf("trace") : logLevels.indexOf(VITE_LOG_LEVEL ?? "info");

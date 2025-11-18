@@ -102,6 +102,14 @@
 </div>
 
 <style lang="scss">
+  @keyframes toolbar-scroll-text {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
   .toolbar-item {
     margin: 0;
     padding: 0.65rem 0.5rem;
@@ -157,15 +165,6 @@
       }
 
       .item-history {
-        @keyframes scroll-text {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-
         display: flex;
       }
 
@@ -174,7 +173,7 @@
           &.scrolling {
             overflow: visible;
             white-space: nowrap;
-            animation: scroll-text 10s linear infinite;
+            animation: toolbar-scroll-text 10s linear infinite;
             animation-delay: 800ms;
           }
         }

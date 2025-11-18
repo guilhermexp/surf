@@ -525,7 +525,8 @@ export class WCViewManager extends EventEmitterBase<WCViewManagerEvents> {
           additionalArguments: [
             ...(opts.additionalArguments || []),
             `--userDataPath=${app.getPath('userData')}`,
-            `--appPath=${app.getAppPath()}${isDev ? '' : '.unpacked'}`,
+            // FIX: In dev mode, remove '.unpacked' to find OCR resources in 'app/resources/ocrs/'
+            `--appPath=${isDev ? app.getAppPath().replace('.unpacked', '') : `${app.getAppPath()}.unpacked`}`,
             `--pdf-viewer-entry-point=${PDFViewerEntryPoint}`,
             ...(process.env.ENABLE_DEBUG_PROXY ? ['--enable-debug-proxy'] : []),
             ...(process.env.DISABLE_TAB_SWITCHING_SHORTCUTS
@@ -588,7 +589,8 @@ export class WCViewManager extends EventEmitterBase<WCViewManagerEvents> {
   createOverlayView(opts: WebContentsViewCreateOptions, extraOpts?: any) {
     const additionalArgs = [
       `--userDataPath=${app.getPath('userData')}`,
-      `--appPath=${app.getAppPath()}${isDev ? '' : '.unpacked'}`,
+      // FIX: In dev mode, remove '.unpacked' to find OCR resources in 'app/resources/ocrs/'
+      `--appPath=${isDev ? app.getAppPath().replace('.unpacked', '') : `${app.getAppPath()}.unpacked`}`,
       `--overlayId=${opts.overlayId || 'default'}`,
       ...(process.env.ENABLE_DEBUG_PROXY ? ['--enable-debug-proxy'] : []),
       ...(process.env.DISABLE_TAB_SWITCHING_SHORTCUTS ? ['--disable-tab-switching-shortcuts'] : [])

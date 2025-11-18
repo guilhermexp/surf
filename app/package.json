@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "main": "./out/main/index.js",
   "author": "Deta GmbH",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",

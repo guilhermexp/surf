@@ -130,7 +130,9 @@ export const initializeSFFSMain = () => {
     num_worker_threads: 2,
     num_processor_threads: 1,
     userDataPath: app.getPath('userData'),
-    appPath: `${app.getAppPath()}${isDev ? '' : '.unpacked'}`
+    // FIX: In dev mode, app.getAppPath() returns 'app.unpacked' but OCR files are in 'app/resources/ocrs/'
+    // Remove '.unpacked' suffix to point to the actual app directory
+    appPath: isDev ? app.getAppPath().replace('.unpacked', '') : `${app.getAppPath()}.unpacked`
   })
 
   registerClaudeAgentBridge(result.sffs)

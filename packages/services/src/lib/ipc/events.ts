@@ -114,6 +114,90 @@ export type UpdateViewBounds = {
   bounds: Electron.Rectangle
 }
 
+// MCP Integration Types
+export interface MCPServerState {
+  id: string
+  status: 'idle' | 'starting' | 'running' | 'error' | 'stopped'
+  tools: MCPToolDefinition[]
+  error?: string
+  pid?: number
+  startedAt?: number
+}
+
+export interface MCPToolDefinition {
+  serverId: string
+  name: string
+  description: string
+  inputSchema: any
+}
+
+export interface MCPToolCall {
+  serverId: string
+  toolName: string
+  arguments: any
+}
+
+export interface MCPToolResult {
+  success: boolean
+  data?: any
+  error?: string
+}
+
+export interface GetMCPServers extends IPCEvent {
+  payload: void
+  output: MCPServerState[]
+}
+
+export interface GetMCPTools extends IPCEvent {
+  payload: void
+  output: MCPToolDefinition[]
+}
+
+export interface ExecuteMCPTool extends IPCEvent {
+  payload: MCPToolCall
+  output: MCPToolResult
+}
+
+export interface GetMCPTelemetry extends IPCEvent {
+  payload: void
+  output: {
+    totalCalls: number
+    successRate: number
+    averageDuration: number
+    failureRate: number
+    byServer: Record<string, { calls: number; successes: number; failures: number }>
+  }
+}
+
+export interface MCPServerConfig {
+  id: string
+  name: string
+  command: string
+  args?: string[]
+  env?: Record<string, string>
+  enabled: boolean
+}
+
+export interface AddMCPServer extends IPCEvent {
+  payload: MCPServerConfig
+  output: { success: boolean; error?: string }
+}
+
+export interface UpdateMCPServer extends IPCEvent {
+  payload: MCPServerConfig
+  output: { success: boolean; error?: string }
+}
+
+export interface DeleteMCPServer extends IPCEvent {
+  payload: { serverId: string }
+  output: { success: boolean; error?: string }
+}
+
+export interface GetMCPConfigs extends IPCEvent {
+  payload: void
+  output: MCPServerConfig[]
+}
+
 const IPC_EVENTS = ipcService.registerEvents({
   // events that don't return a value
   updateTrafficLights: ipcService.addEvent<boolean>('update-traffic-lights'),
@@ -202,7 +286,17 @@ const IPC_EVENTS = ipcService.registerEvents({
     'webcontentsview-manager-action'
   ),
   webContentsViewAction:
-    ipcService.addEventWithReturn<WebContentsViewActionEvent>('webcontentsview-action')
+    ipcService.addEventWithReturn<WebContentsViewActionEvent>('webcontentsview-action'),
+
+  // MCP Integration events
+  getMCPServers: ipcService.addEventWithReturn<GetMCPServers>('get-mcp-servers'),
+  getMCPTools: ipcService.addEventWithReturn<GetMCPTools>('get-mcp-tools'),
+  executeMCPTool: ipcService.addEventWithReturn<ExecuteMCPTool>('execute-mcp-tool'),
+  getMCPTelemetry: ipcService.addEventWithReturn<GetMCPTelemetry>('get-mcp-telemetry'),
+  getMCPConfigs: ipcService.addEventWithReturn<GetMCPConfigs>('get-mcp-configs'),
+  addMCPServer: ipcService.addEventWithReturn<AddMCPServer>('add-mcp-server'),
+  updateMCPServer: ipcService.addEventWithReturn<UpdateMCPServer>('update-mcp-server'),
+  deleteMCPServer: ipcService.addEventWithReturn<DeleteMCPServer>('delete-mcp-server')
 })
 
 export const IPC_EVENTS_MAIN = IPC_EVENTS.main

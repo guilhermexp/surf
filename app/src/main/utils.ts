@@ -3,6 +3,7 @@ import { execSync } from 'child_process'
 import path from 'path'
 import { promises as fsp } from 'fs'
 import mimeTypes from 'mime-types'
+import { resolvePlatform } from '@deta/utils/system/runtimeEnv'
 
 export let isAppSetup = false
 
@@ -59,7 +60,7 @@ export const isDefaultBrowser = async () => {
 }
 
 export const getPlatform = () => {
-  const platform = import.meta.env.PLATFORM
+  const platform = resolvePlatform()
 
   if (platform === 'darwin') {
     return 'mac'

@@ -2,7 +2,7 @@ import { get, type Writable } from 'svelte/store'
 import PQueue from 'p-queue'
 
 import { Toast, useToasts } from '@deta/ui'
-import { useLocalStorageStore, useLogScope, ResourceTag } from '@deta/utils'
+import { useLocalStorageStore, useLogScope, ResourceTag, getRuntimeEnvString } from '@deta/utils'
 import { ResourceTypes } from '@deta/types'
 
 import { type ResourceManager } from './resources/resources.svelte'
@@ -37,8 +37,8 @@ export class SyncService {
   private getConfig() {
     const userSettings = get(this.userConfig.settings)
 
-    const envToken = import.meta.env.R_VITE_SYNC_AUTH_TOKEN
-    const envBaseUrl = import.meta.env.R_VITE_SYNC_BASE_URL
+    const envToken = getRuntimeEnvString('R_VITE_SYNC_AUTH_TOKEN')
+    const envBaseUrl = getRuntimeEnvString('R_VITE_SYNC_BASE_URL')
 
     if (envToken && envBaseUrl) {
       this.log.debug('using env config')

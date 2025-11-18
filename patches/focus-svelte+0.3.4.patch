@@ -1,0 +1,30 @@
+diff --git a/node_modules/focus-svelte/package.json b/node_modules/focus-svelte/package.json
+index 8587ae3..fb9e3e8 100644
+--- a/node_modules/focus-svelte/package.json
++++ b/node_modules/focus-svelte/package.json
+@@
+-  "exports": {
+-    "./package.json": "./package.json",
+-    "./action/focus": "./action/focus.js",
+-    "./action": "./action/index.js",
+-    "./component/Focus/Focus.svelte": "./component/Focus/Focus.svelte",
+-    "./component/Focus": "./component/Focus/index.js",
+-    "./component": "./component/index.js",
+-    ".": "./index.js"
+-  },
++  "exports": {
++    "./package.json": "./package.json",
++    "./action/focus": "./action/focus.js",
++    "./action": "./action/index.js",
++    "./component/Focus/Focus.svelte": {
++      "svelte": "./component/Focus/Focus.svelte",
++      "import": "./component/Focus/Focus.svelte"
++    },
++    "./component/Focus": "./component/Focus/index.js",
++    "./component": "./component/index.js",
++    ".": {
++      "svelte": "./index.js",
++      "import": "./index.js"
++    }
++  },
+ EOF

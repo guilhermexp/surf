@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use super::prompt::prompt;
 use crate::ai::brain::agents::context_manager::tools::{
-    AddResourcesTool, AddUrlsTool, PopulateContextContentTool,
+    AddResourcesTool, PopulateContextContentTool,
 };
 use crate::ai::brain::agents::{Agent, AgentConfig};
 use crate::ai::llm::client::LLMClient;
