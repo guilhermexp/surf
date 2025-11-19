@@ -321,6 +321,46 @@ impl ChatCompletionStream {
         }
     }
 
+    /// Create a simulated streaming response from a complete message
+    /// This splits the message into smaller chunks to simulate incremental streaming
+    fn from_simulated_stream(
+        complete_message: String,
+        provider: Provider,
+        cancellation_token: CancellationToken,
+        chunk_size: usize,
+    ) -> Self {
+        let mut queue = VecDeque::new();
+
+        // Split the complete message into smaller chunks
+        let chars: Vec<char> = complete_message.chars().collect();
+        let total_chars = chars.len();
+
+        if total_chars == 0 {
+            queue.push_back(Ok(String::new()));
+        } else {
+            let mut start = 0;
+            while start < total_chars {
+                let end = std::cmp::min(start + chunk_size, total_chars);
+                let chunk: String = chars[start..end].iter().collect();
+                queue.push_back(Ok(chunk));
+                start = end;
+            }
+        }
+
+        tracing::info!("[ChatCompletionStream] Created simulated stream with {} chunks from {} chars",
+                     queue.len(), total_chars);
+
+        Self {
+            reader: StreamReader::Custom(queue),
+            buffer: String::new(),
+            provider,
+            last_update: Instant::now(),
+            // Add small delay between chunks to simulate network streaming
+            update_interval: Duration::from_millis(30),
+            cancellation_token,
+        }
+    }
+
     pub fn set_packets_per_second(&mut self, pps: u32) {
         self.update_interval = Duration::from_secs_f64(1.0 / pps as f64);
     }
@@ -830,12 +870,17 @@ impl LLMClient {
             let output =
                 self.run_claude_agent_completion(normalized_messages, model, custom_key)?;
             tracing::info!(
-                "[LLM Client] Got output from Claude Agent, creating single chunk stream"
+                "[LLM Client] Got output from Claude Agent ({} chars), creating simulated stream",
+                output.len()
             );
-            return Ok(ChatCompletionStream::from_single_chunk(
-                Ok(output),
+            // Use simulated streaming with reasonable chunk size
+            // 30-50 chars per chunk creates a smooth streaming experience
+            // similar to other providers like OpenAI/Anthropic
+            return Ok(ChatCompletionStream::from_simulated_stream(
+                output,
                 Provider::ClaudeAgent,
                 cancellation_token,
+                40, // chunk size in characters - balanced for smooth streaming
             ));
         }
 

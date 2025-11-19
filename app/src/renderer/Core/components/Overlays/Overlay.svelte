@@ -32,30 +32,24 @@
   })
 
   onMount(async () => {
-    overlay = await overlayManager.create({ bounds })
+    try {
+      overlay = await overlayManager.create({ bounds })
 
-    instance = mount(OverlayConsumer, {
-      target: overlay.wrapperElement,
-      props: { children }
-    })
+      instance = mount(OverlayConsumer, {
+        target: overlay.wrapperElement,
+        props: { children }
+      })
 
-    unsubs.push(copyStyles(overlay.window))
+      unsubs.push(copyStyles(overlay.window))
 
-    if (autofocus) {
-      overlay.focus()
-
-      // sue me
-      setTimeout(() => {
+      if (autofocus) {
         overlay.focus()
-      }, 100)
-
-      setTimeout(() => {
-        overlay.focus()
-      }, 300)
-
-      setTimeout(() => {
-        overlay.focus()
-      }, 400)
+        setTimeout(() => overlay.focus(), 100)
+        setTimeout(() => overlay.focus(), 300)
+        setTimeout(() => overlay.focus(), 400)
+      }
+    } catch (e) {
+      disabled = true
     }
   })
 

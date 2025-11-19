@@ -9,7 +9,7 @@ use neon::{prelude::ModuleContext, result::NeonResult};
 #[derive(thiserror::Error, Debug)]
 pub enum BackendError {
     #[error("IO error: {0}")]
-    IOError(#[from] std::io::Error),
+    IOError(std::io::Error),
     #[error("Database error: {0}")]
     DatabaseError(#[from] rusqlite::Error),
     #[error("Chrono error: {0}")]
@@ -44,6 +44,23 @@ pub enum BackendError {
 }
 
 type BackendResult<T> = Result<T, BackendError>;
+
+impl From<std::io::Error> for BackendError {
+    fn from(err: std::io::Error) -> Self {
+        // Try to get more context about the IO error
+        eprintln!("🔴 IO Error occurred: {err}");
+        eprintln!("   Error kind: {:?}", err.kind());
+        if let Some(inner) = err.get_ref() {
+            eprintln!("   Inner error: {inner}");
+        }
+        // Print stack trace to help identify where the error occurred
+        // Force capture even in release mode
+        eprintln!("   Backtrace:");
+        let bt = std::backtrace::Backtrace::force_capture();
+        eprintln!("{}", bt);
+        BackendError::IOError(err)
+    }
+}
 
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {

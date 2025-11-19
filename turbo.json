@@ -121,6 +121,7 @@
       "dependsOn": [
         "@deta/backend#build",
         "@deta/backend-server#dev",
+        "@deta/services#build",
         "@deta/ui#build:tailwind",
         "@deta/dragcula#build"
       ],
@@ -138,6 +139,7 @@
       "dependsOn": [
         "@deta/backend#build",
         "@deta/backend-server#dev",
+        "@deta/services#build",
         "@deta/ui#build:tailwind",
         "@deta/dragcula#build"
       ],

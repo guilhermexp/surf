@@ -2,6 +2,12 @@ const { spawn } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
+// Ensure runtime env detects development mode before any workspace code runs.
+// Lots of modules rely on process.env.DEV to resolve paths (e.g. app/resources vs app.unpacked).
+if (!process.env.DEV) {
+  process.env.DEV = 'true'
+}
+
 if (process.platform === 'darwin') {
   const frameworksPath = path.resolve(
     __dirname,
@@ -25,7 +31,7 @@ if (process.platform === 'linux') {
   process.env.ELECTRON_OZONE_PLATFORM_HINT = 'auto'
 }
 process.env.TESSDATA_PREFIX = path.resolve(__dirname, '..', 'resources', 'tessdata')
-process.env.M_VITE_PRODUCT_NAME = 'Surf-dev'
+process.env.M_VITE_PRODUCT_NAME = 'Surf' // Changed from 'Surf-dev' to use same userData as production
 process.env.RUST_LOG = process.env.RUST_LOG || 'none,backend_server=INFO,backend=DEBUG'
 
 const extraArgsIndex = process.argv.indexOf('--')

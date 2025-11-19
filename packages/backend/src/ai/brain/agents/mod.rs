@@ -910,7 +910,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_xml_tool_call_parsing() {
-        let agent = create_test_agent(vec![], None);
+        let mut agent = create_test_agent(vec![], None);
+        agent.add_tool(Box::new(MockTool::new("search", "Search tool")));
 
         let response = r#"<tool_calls>
 <tool name="search">
@@ -952,7 +953,9 @@ This is the final answer to the user's question.
 
     #[tokio::test]
     async fn test_xml_multiple_tool_calls() {
-        let agent = create_test_agent(vec![], None);
+        let mut agent = create_test_agent(vec![], None);
+        agent.add_tool(Box::new(MockTool::new("search", "Search tool")));
+        agent.add_tool(Box::new(MockTool::new("process", "Process tool")));
 
         let response = r#"<tool_calls>
 <tool name="search">
@@ -1020,7 +1023,7 @@ This is some text with a citation <citation>
             &self,
             _messages: Vec<Message>,
             _model: &Model,
-            _custom_key: Option<&str>,
+            _custom_key: Option<String>,
             _response_format: Option<serde_json::Value>,
         ) -> BackendResult<String> {
             let mut current = self.current_response.lock().unwrap();
@@ -1037,7 +1040,7 @@ This is some text with a citation <citation>
             &self,
             _messages: Vec<Message>,
             _model: &Model,
-            _custom_key: Option<&str>,
+            _custom_key: Option<String>,
             _response_format: Option<serde_json::Value>,
             _cancellation_token: CancellationToken,
         ) -> BackendResult<ChatCompletionStream> {

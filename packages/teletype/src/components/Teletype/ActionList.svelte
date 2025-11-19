@@ -15,12 +15,16 @@
     actions,
     freeze = false,
     isOption = false,
-    preferredActionIndex = null
+    preferredActionIndex = null,
+    onexecute,
+    onselected
   }: {
     actions: Action[]
     freeze?: boolean
     isOption?: boolean
     preferredActionIndex?: number | null
+    onexecute?: (action: Action) => void
+    onselected?: (action: Action) => void
   } = $props()
 
   const log = useLogScope('ActionList')
@@ -29,11 +33,6 @@
     log.debug('Received actions prop:', actions)
     log.debug('Actions length:', actions?.length || 0)
   })
-
-  const dispatch = createEventDispatcher<{
-    execute: Action
-    selected: Action
-  }>()
 
   // Group actions by section
   // Group and sort actions by section and display priority
@@ -129,7 +128,7 @@
   }
 
   onMount(() => {
-    dispatch('selected', activeAction)
+    onselected?.(activeAction)
 
     // Add scroll handler to the parent container
     window.addEventListener('wheel', handleScroll, {
@@ -143,7 +142,7 @@
 
   $effect(() => {
     if (activeAction) {
-      dispatch('selected', activeAction)
+      onselected?.(activeAction)
     }
   })
 
@@ -165,17 +164,17 @@
 
     const secondaryAction = options.find((a) => a.shortcutType === 'secondary')
     if (e.shiftKey && secondaryAction) {
-      dispatch('execute', secondaryAction as Action)
+      onexecute?.(secondaryAction as Action)
       return
     }
 
     const tertiaryAction = options.find((a) => a.shortcutType === 'tertiary')
     if ((e.ctrlKey || e.metaKey) && tertiaryAction) {
-      dispatch('execute', tertiaryAction as Action)
+      onexecute?.(tertiaryAction as Action)
       return
     }
 
-    dispatch('execute', action)
+    onexecute?.(action)
   }
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -247,15 +246,15 @@
   }
 
   const isActionInlineReplace = (action: Action) => {
-    return action.view === 'InlineReplace' && action.component
+    return action.view === 'InlineReplace' && 'component' in action
   }
 
   const isActionInline = (action: Action) => {
-    return action.view === 'Inline' && action.component
+    return action.view === 'Inline' && 'component' in action
   }
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 {#if parsedActions.length > 0}
   <div
     bind:this={listboxNode}
@@ -273,7 +272,7 @@
           {#if actions[0]?.horizontalParentAction}
             <button
               class="trailing"
-              on:click={() => {
+              onclick={() => {
                 // Execute the horizontal parent action directly
                 if (actions[0].horizontalParentAction?.handler) {
                   actions[0].horizontalParentAction.handler(
@@ -297,22 +296,31 @@
             class:active={getActionIndex(action.id) === activeActionIndex}
             in:slide={{ duration: 200 }}
           >
-            <svelte:component this={action.component} {action} {...action.componentProps || {}} />
+            {#key `${action.id}-inline`}
+              {@const Component = (action as any).component}
+              <Component {action} {...(action as any).componentProps || {}} />
+            {/key}
           </div>
         {:else if isActionInlineReplace(action) && getActionIndex(action.id) === activeActionIndex}
           <!-- Show component only when active for InlineReplace view -->
           <div class="inline-component replace" in:slide={{ duration: 200 }}>
-            <svelte:component this={action.component} {action} {...action.componentProps || {}} />
+            {#key `${action.id}-inline-replace`}
+              {@const Component = (action as any).component}
+              <Component {action} {...(action as any).componentProps || {}} />
+            {/key}
           </div>
         {:else}
           <ActionItem
             {action}
             {isOption}
-            on:execute
-            on:selected={() => {
-              activeActionIndex = getActionIndex(action.id)
-              userHasNavigated = true
-              log.debug('User clicked action, setting userHasNavigated = true')
+            onexecute={(a) => onexecute?.(a)}
+            onselected={() => {
+              const idx = getActionIndex(action.id)
+              if (idx !== undefined) {
+                activeActionIndex = idx
+                userHasNavigated = true
+                log.debug('User clicked action, setting userHasNavigated = true')
+              }
             }}
             active={getActionIndex(action.id) === activeActionIndex}
           />

@@ -80,9 +80,4 @@
     border: 1px solid lime;
     user-select: none;
   }
-
-  .children {
-    padding-left: 1rem;
-    min-height: 20px;
-  }
 </style>

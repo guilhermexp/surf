@@ -102,7 +102,16 @@ impl AgentIO for NoteIO {
     }
 
     fn read(&self) -> BackendResult<String> {
-        let content = fs::read_to_string(Path::join(&self.resources_path, &self.id))?;
+        let path = Path::join(&self.resources_path, &self.id);
+        // Check if file exists before trying to read
+        if !path.exists() {
+            eprintln!(
+                "⚠️  Note file doesn't exist yet: {:?}, returning empty string",
+                path
+            );
+            return Ok(String::new());
+        }
+        let content = fs::read_to_string(&path)?;
         Ok(content)
     }
 
@@ -155,7 +164,10 @@ impl CallbackIO {
     }
 
     pub fn content(&self) -> String {
-        self.buffer.lock().map(|buf| buf.clone()).unwrap_or_default()
+        self.buffer
+            .lock()
+            .map(|buf| buf.clone())
+            .unwrap_or_default()
     }
 }
 

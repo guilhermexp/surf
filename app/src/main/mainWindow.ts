@@ -382,13 +382,22 @@ export function createWindow() {
 
   setupMainWindowWebContentsHandlers(mainWindow.webContents, viewManager)
 
-  // if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-  //   mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/Core/core.html`)
-  // } else {
-  //   mainWindow.loadFile(join(__dirname, '../renderer/Core/core.html'))
-  // }
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/Core/core.html`)
+  } else {
+    mainWindow.loadURL('surf-internal://Core/core.html')
+  }
 
-  mainWindow.loadURL('surf-internal://Core/Core/core.html')
+  // Force show in dev mode after a delay to debug white screen
+  if (is.dev) {
+    setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
+        log.warn('Window not visible after 3s, forcing show for debugging')
+        mainWindow.show()
+        mainWindow.webContents.openDevTools()
+      }
+    }, 3000)
+  }
 }
 
 export function getMainWindow(): BrowserWindow | undefined {

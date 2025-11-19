@@ -5,7 +5,6 @@
   import { Button, openDialog, Dropdown } from '@deta/ui'
   import { FormField, Expandable } from '@deta/ui/legacy'
   import { translator as t } from '../../Core/i18n'
-  import { IPC_EVENTS_RENDERER as IPC_EVENTS } from '@deta/services/ipc'
 
   type MCPServerState = {
     id: string
@@ -49,7 +48,8 @@
   const loadMCPServers = async () => {
     try {
       loading.set(true)
-      const result = await IPC_EVENTS.getMCPServers()
+      // @ts-ignore
+      const result = await window.api.getMCPServers()
       if (result) {
         servers.set(result)
       }
@@ -99,7 +99,8 @@
     }
 
     try {
-      const result = await IPC_EVENTS.addMCPServer(newServer)
+      // @ts-ignore
+      const result = await window.api.addMCPServer(newServer)
       if (result.success) {
         showStatus('Server added successfully')
         await loadMCPServers()
@@ -129,7 +130,8 @@
     if (!confirmed) return
 
     try {
-      const result = await IPC_EVENTS.deleteMCPServer({ serverId })
+      // @ts-ignore
+      const result = await window.api.deleteMCPServer({ serverId })
       if (result.success) {
         showStatus(`Server ${serverId} deleted`)
         await loadMCPServers()

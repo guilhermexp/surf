@@ -7,7 +7,7 @@ import { EventEmitter } from 'node:events'
 
 // Polyfill to fix AbortSignal.setMaxListeners compatibility issue in Electron
 // The SDK tries to call setMaxListeners on AbortSignal which is not an EventEmitter
-if (typeof AbortSignal !== 'undefined' && !AbortSignal.prototype.setMaxListeners) {
+if (typeof AbortSignal !== 'undefined' && !(AbortSignal.prototype as any).setMaxListeners) {
   Object.defineProperty(AbortSignal.prototype, 'setMaxListeners', {
     value: function () {
       // AbortSignal doesn't need max listeners management, so this is a no-op
@@ -264,7 +264,8 @@ async function runClaudeAgentInvocation(
     const startTime = Date.now()
 
     try {
-      for await (const message of stream) {
+      for await (const msg of stream) {
+        const message = msg as any
         // Check timeout manually
         if (Date.now() - startTime > timeout) {
           logError('Request timed out after', timeout, 'ms')
@@ -274,10 +275,10 @@ async function runClaudeAgentInvocation(
         messageCount++
         log('Received message #' + messageCount + ':', {
           type: message.type,
-          subtype: (message as any).subtype,
-          hasResult: !!(message as any).result,
-          isError: (message as any).is_error,
-          hasContent: !!(message as any).content,
+          subtype: message.subtype,
+          hasResult: !!message.result,
+          isError: message.is_error,
+          hasContent: !!message.content,
           fullMessage: message
         })
 
@@ -294,7 +295,7 @@ async function runClaudeAgentInvocation(
         }
 
         if (message.type === 'result') {
-          log('Got result message, subtype:', (message as any).subtype)
+          log('Got result message, subtype:', message.subtype)
           if (message.subtype === 'success') {
             // If result has content and we haven't accumulated anything, use it
             if (message.result && !output) {

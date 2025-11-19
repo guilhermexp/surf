@@ -5,10 +5,21 @@
   import Notifications from './Notifications.svelte'
   import { createEventDispatcher } from 'svelte'
 
+  import type { Snippet } from 'svelte'
+
   let {
     preferredActionIndex = null,
-    hideNavigation = false
-  }: { preferredActionIndex?: number | null; hideNavigation?: boolean } = $props()
+    hideNavigation = false,
+    header,
+    tools,
+    sidecarRight
+  }: {
+    preferredActionIndex?: number | null
+    hideNavigation?: boolean
+    header?: Snippet
+    tools?: Snippet<[{ disabled: boolean }]>
+    sidecarRight?: Snippet
+  } = $props()
 
   const teletype = useTeletype()
 
@@ -30,10 +41,10 @@
 
   function disableScroll() {
     scrollTop = window.pageYOffset || window.document.documentElement.scrollTop
-    ;(scrollLeft = window.pageXOffset || window.document.documentElement.scrollLeft),
+    ;((scrollLeft = window.pageXOffset || window.document.documentElement.scrollLeft),
       (window.onscroll = function () {
         window.scrollTo(scrollLeft, scrollTop)
-      })
+      }))
   }
 
   function enableScroll() {
@@ -61,21 +72,17 @@
   <TeletypeCore
     {preferredActionIndex}
     {hideNavigation}
+    {header}
+    {tools}
     on:input
     on:actions-rendered
     on:ask
     on:create-note
     on:clear
     on:search-web
-  >
-    <slot name="header" slot="header" />
+  />
 
-    <svelte:fragment slot="tools" let:disabled>
-      <slot name="tools" {disabled}></slot>
-    </svelte:fragment>
-  </TeletypeCore>
-
-  <slot name="sidecar-right" />
+  {@render sidecarRight?.()}
 </div>
 
 {#if $confirmationPrompt}

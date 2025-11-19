@@ -21,6 +21,7 @@
       writable({ name: "file 3", children: writable([]) })
     ])
   });
+  let isHovered = false;
 </script>
 
 <File file={root} />
@@ -29,8 +30,10 @@
 
 <div
   class="hoverable"
-  on:dragenter={(e) => e.target.classList.add("hover")}
-  on:dragleave={(e) => e.target.classList.remove("hover")}
+  class:hover={isHovered}
+  role="group"
+  on:dragenter={() => (isHovered = true)}
+  on:dragleave={() => (isHovered = false)}
 >
   hoverable
   <span>foo</span>

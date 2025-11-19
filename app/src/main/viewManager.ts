@@ -1164,7 +1164,7 @@ export class WCViewManager extends EventEmitterBase<WCViewManagerEvents> {
             }
           } else if (type === WebContentsViewManagerActionType.HIDE_ALL) {
             log.log('[main] webcontentsview-hideAll: IPC event received, hiding all views')
-            this.hideAllViews()
+            this.hideAllViews(payload)
             return true
           } else if (type === WebContentsViewManagerActionType.SHOW_ACTIVE) {
             log.log('[main] webcontentsview-showActive: IPC event received, showing active view')

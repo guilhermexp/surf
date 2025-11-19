@@ -72,7 +72,7 @@ export default defineConfig({
       }),
       replace({
         'doc.documentElement.style': '{}'
-      }),
+      }) as any,
       createLicensePlugin('preload')
     ],
     build: {
@@ -95,6 +95,21 @@ export default defineConfig({
   },
   renderer: {
     envPrefix: 'R_VITE_',
+    server: {
+      host: '127.0.0.1',
+      port: 5174,
+      strictPort: true,
+      hmr: {
+        protocol: 'ws',
+        host: '127.0.0.1',
+        port: 5174,
+        timeout: 30000,
+        overlay: false
+      },
+      watch: {
+        usePolling: false
+      }
+    },
     plugins: [
       Markdown({ mode: [Mode.MARKDOWN, Mode.HTML] }),
       svelte(svelteOptions),

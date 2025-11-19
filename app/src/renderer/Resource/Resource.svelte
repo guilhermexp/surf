@@ -273,13 +273,8 @@
   }
 
   :global(body) {
-    background: light-dark(
-        linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 1)),
-        linear-gradient(rgba(16, 16, 16, 0.95), rgba(16, 16, 16, 1))
-      ),
-      url('./assets/greenfield.png');
-    background: light-dark(rgba(250, 250, 250, 1), #101010);
-    background: light-dark(
+    background:
+      light-dark(
         linear-gradient(to bottom, rgba(250, 250, 250, 1) 0%, rgba(255, 255, 255, 0.9) 10%),
         linear-gradient(to bottom, rgba(16, 16, 16, 0.98) 0%, rgba(5, 5, 5, 1) 12%)
       ),

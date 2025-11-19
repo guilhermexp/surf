@@ -45,6 +45,15 @@ export function createSettingsWindow(tab?: SettingsWindowTab) {
 
   applyCSPToSession(settingsWindowSession)
 
+  // WORKAROUND: additionalArguments don't work with contextIsolation
+  // Send userDataPath via webContents instead
+  settingsWindow.webContents.on('did-finish-load', () => {
+    settingsWindow?.webContents.executeJavaScript(`
+      window.__SURF_USER_DATA_PATH__ = ${JSON.stringify(app.getPath('userData'))};
+      window.__SURF_SETTINGS_ENTRYPOINT__ = ${JSON.stringify(SettingsWindowEntrypoint)};
+    `)
+  })
+
   settingsWindow.on('ready-to-show', () => {
     if (!is.dev) {
       settingsWindow?.showInactive()
@@ -85,7 +94,9 @@ export function createSettingsWindow(tab?: SettingsWindowTab) {
       `${process.env['ELECTRON_RENDERER_URL']}/Settings/settings.html${tabParam}`
     )
   } else {
-    settingsWindow.loadFile(join(__dirname, '../renderer', 'Settings', 'settings.html') + tabParam)
+    settingsWindow.loadFile(join(__dirname, '../renderer', 'Settings', 'settings.html'), {
+      query: tabParam ? { tab } : undefined
+    })
   }
 }
 

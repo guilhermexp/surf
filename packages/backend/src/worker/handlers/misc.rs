@@ -116,6 +116,7 @@ impl Worker {
         docs: Vec<String>,
         threshold: Option<f32>,
     ) -> BackendResult<Vec<DocsSimilarity>> {
+        self.wait_for_backend();
         self.ai.get_docs_similarity(query, docs, threshold)
     }
 
@@ -194,6 +195,7 @@ impl Worker {
         resource_ids: Option<Vec<String>>,
         callback: Root<JsFunction>,
     ) -> BackendResult<()> {
+        self.wait_for_backend();
         let results = self.ai.vector_search(
             &self.db,
             query,
@@ -497,6 +499,7 @@ impl Worker {
         history: Vec<Message>,
         should_cluster: bool,
     ) -> BackendResult<(String, ChatResult)> {
+        self.wait_for_backend();
         let mut chat_result = self
             .ai
             .chat(&self.db, chat_input, history, should_cluster)?;
@@ -695,6 +698,7 @@ impl Worker {
             let filter: Vec<String> = resource_ids_first.iter().map(|id| id.to_string()).collect();
             //
             // TODO: why 100?
+            self.wait_for_backend();
             let resources = self.ai.vector_search(
                 &self.db,
                 query.clone(),
@@ -804,6 +808,7 @@ impl Worker {
                 }
             }
 
+            self.wait_for_backend();
             let vector_search_results = self.ai.vector_search(
                 &self.db,
                 query,

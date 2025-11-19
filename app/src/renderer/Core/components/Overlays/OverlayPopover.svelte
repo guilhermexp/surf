@@ -2,6 +2,7 @@
   import { clickOutside, useLogScope } from '@deta/utils'
   import Overlay from '../Overlays/Overlay.svelte'
   import type { OverlayPopoverProps } from './types'
+  import { useViewManager } from '@deta/services/views'
 
   let {
     open = $bindable(false),
@@ -14,6 +15,7 @@
   }: OverlayPopoverProps = $props()
 
   const log = useLogScope('OverlayPopover')
+  const viewManager = useViewManager()
 
   let bounds = $state({ x: 200, y: 200, width, height })
 
@@ -53,7 +55,18 @@
     log.debug('New overlay bounds:', bounds)
 
     open = !open
+    try {
+      if (open) viewManager.hideViews(true, { hidePermanentlyActive: true })
+      else viewManager.showViews()
+    } catch {}
   }
+
+  $effect(() => {
+    try {
+      if (open) viewManager.hideViews(true, { hidePermanentlyActive: true })
+      else viewManager.showViews()
+    } catch {}
+  })
 </script>
 
 <div class="popover-root">

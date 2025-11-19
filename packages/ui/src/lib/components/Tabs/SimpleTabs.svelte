@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     export type Tab = {
         id: string
         label: string
@@ -19,7 +19,7 @@
       class="tab"
       class:active={tab.id === activeTabId}
       class:disabled={tab.disabled}
-      on:click={() => {
+      onclick={() => {
         if (!tab.disabled) {
           activeTabId = tab.id
           onSelect?.(tab)

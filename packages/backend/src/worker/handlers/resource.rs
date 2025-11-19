@@ -323,6 +323,7 @@ impl Worker {
         }
 
         if semantic_search_enabled {
+            self.wait_for_backend();
             let vector_search_results = self.ai.vector_search(
                 &self.db,
                 params.query.clone(),
@@ -618,6 +619,8 @@ impl Worker {
         }
         // commit transaction already to not hold the table lock
         tx.commit()?;
+
+        self.wait_for_backend();
 
         match self
             .ai

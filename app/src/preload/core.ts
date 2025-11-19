@@ -2,6 +2,7 @@ import { clipboard, contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 import path from 'path'
+import os from 'os'
 import mime from 'mime-types'
 import fetch from 'cross-fetch'
 
@@ -49,7 +50,10 @@ const USER_DATA_PATH =
 
 const DISABLE_TAB_SWITCHING_SHORTCUTS = process.argv.includes('--disable-tab-switching-shortcuts')
 
-const userConfig = getUserConfig(USER_DATA_PATH) // getConfig<UserConfig>(USER_DATA_PATH, 'user.json')
+// Use fallback path if USER_DATA_PATH is empty (Settings window issue)
+const configPath =
+  USER_DATA_PATH || path.join(os.homedir(), 'Library', 'Application Support', 'Surf')
+const userConfig = getUserConfig(configPath)
 
 const PDFViewerEntryPoint =
   process.argv.find((arg) => arg.startsWith('--pdf-viewer-entry-point='))?.split('=')[1] || ''
@@ -750,18 +754,6 @@ const api = {
     IPC_EVENTS_RENDERER.focusMainRenderer.send()
   },
 
-  webContentsViewManagerAction: <T extends WebContentsViewManagerActionType>(
-    type: T,
-    ...args: WebContentsViewManagerActionPayloads[T] extends undefined
-      ? []
-      : [payload: WebContentsViewManagerActionPayloads[T]]
-  ) => {
-    const action = { type, payload: args[0] } as WebContentsViewManagerAction
-    return IPC_EVENTS_RENDERER.webContentsViewManagerAction.invoke(action) as Promise<
-      WebContentsViewManagerActionOutputs[T]
-    >
-  },
-
   webContentsViewAction: <T extends WebContentsViewActionType>(
     viewId: string,
     type: T,
@@ -773,6 +765,39 @@ const api = {
     return IPC_EVENTS_RENDERER.webContentsViewAction.invoke({ viewId, action } as any) as Promise<
       WebContentsViewActionOutputs[T]
     >
+  },
+
+  // MCP Integration
+  getMCPServers: () => {
+    return IPC_EVENTS_RENDERER.getMCPServers.invoke()
+  },
+
+  getMCPTools: () => {
+    return IPC_EVENTS_RENDERER.getMCPTools.invoke()
+  },
+
+  executeMCPTool: (toolCall: any) => {
+    return IPC_EVENTS_RENDERER.executeMCPTool.invoke(toolCall)
+  },
+
+  getMCPTelemetry: () => {
+    return IPC_EVENTS_RENDERER.getMCPTelemetry.invoke()
+  },
+
+  getMCPConfigs: () => {
+    return IPC_EVENTS_RENDERER.getMCPConfigs.invoke()
+  },
+
+  addMCPServer: (config: any) => {
+    return IPC_EVENTS_RENDERER.addMCPServer.invoke(config)
+  },
+
+  updateMCPServer: (config: any) => {
+    return IPC_EVENTS_RENDERER.updateMCPServer.invoke(config)
+  },
+
+  deleteMCPServer: (payload: { serverId: string }) => {
+    return IPC_EVENTS_RENDERER.deleteMCPServer.invoke(payload)
   },
 
   ...eventHandlers

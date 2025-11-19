@@ -60,8 +60,8 @@
   const viewManager = useViewManager()
   const browser = useBrowser()
 
-  const activeViewType = $derived(view.type ?? writable(''))
-  const activeViewTypeData = $derived(view.typeData ?? writable({}))
+  const activeViewType = $derived(view?.type ?? writable(ViewType.Page))
+  const activeViewTypeData = $derived(view?.typeData ?? writable({ type: ViewType.Page, id: null }))
 
   let notebookSidebarOpen = $state(
     localStorage.getItem('notebook_treeSidebarOpen')
@@ -168,7 +168,7 @@
   {:else if !hideNotebookSidebar && $activeViewType === ViewType.Resource}
     <ResourceLoader resource={$activeViewTypeData?.id} lazy={false}>
       {#snippet children(resource: Resource)}
-        {#if resource.type !== ResourceTypes.PDF}
+        {#if resource && resource.type !== ResourceTypes.PDF}
           <NavigationBarGroup slim>
             <Button size="md" square onclick={toggleNotebookSidebar}>
               <Icon name={notebookSidebarOpen ? 'sidebar.left' : 'sidebar.left'} size="1.2em" />

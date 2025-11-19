@@ -67,6 +67,7 @@ const initializePaths = () => {
     : join(dirname(app.getPath('userData')), CONFIG.appName)
   mkdirSync(userDataPath, { recursive: true })
   app.setPath('userData', userDataPath)
+  log.info('Using userData path:', userDataPath)
   return userDataPath
 }
 

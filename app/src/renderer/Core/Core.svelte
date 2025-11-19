@@ -381,7 +381,11 @@
 
   <main class:vertical-layout={$tabOrientation === TabOrientation.Vertical}>
     {#if shouldRenderVerticalTabsShell}
-      <div class="vertical-tabs-shell" data-expanded={verticalTabsExpanded}>
+      <div
+        class="vertical-tabs-shell"
+        data-expanded={verticalTabsExpanded}
+        data-behavior={verticalTabsBehavior}
+      >
         <div
           class="vertical-tabs-controls"
           data-expanded={verticalTabsExpanded}
@@ -526,6 +530,14 @@
     padding: 0 5px;
     app-region: drag;
     gap: 10px;
+
+    :global([data-button-root]),
+    :global(button),
+    :global(input),
+    :global(select),
+    :global(textarea) {
+      app-region: no-drag;
+    }
   }
 
   main {
@@ -860,6 +872,16 @@
   }
 
   :global(body.os_mac) .vertical-tabs-shell[data-expanded='false'] .vertical-tabs-controls {
+    left: calc(env(titlebar-area-width, 80px) + 0.75rem);
+  }
+
+  .vertical-tabs-shell[data-behavior='hover'] .vertical-tabs-controls {
+    right: auto;
+    left: 0.75rem;
+    transform: none;
+  }
+
+  :global(body.os_mac) .vertical-tabs-shell[data-behavior='hover'] .vertical-tabs-controls {
     left: calc(env(titlebar-area-width, 80px) + 0.75rem);
   }
 

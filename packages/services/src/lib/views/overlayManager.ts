@@ -56,7 +56,15 @@ export class Overlay {
   }
 
   handleClickOutside(event: MouseEvent) {
-    this.manager.destroy(this.id)
+    const content = this.wrapperElement
+    const target = event.target as Node | null
+    if (!content || !target) {
+      this.manager.destroy(this.id)
+      return
+    }
+    if (!content.contains(target)) {
+      this.manager.destroy(this.id)
+    }
   }
 
   attachListeners() {
@@ -77,7 +85,9 @@ export class Overlay {
 
     this.unsubs.push(unsubWebContentsEvents)
 
-    window.addEventListener('click', (event) => this.handleClickOutside(event), { passive: true })
+    this.window.addEventListener('click', (event) => this.handleClickOutside(event), {
+      passive: true
+    })
   }
 
   async saveBounds(bounds: Electron.Rectangle) {

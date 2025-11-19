@@ -1,13 +1,19 @@
 module.exports = {
-  parserOptions: {
-    extraFileExtensions: ['.svelte']
+  root: true,
+  env: {
+    browser: true,
+    es2021: true,
+    node: true
   },
   extends: [
     'eslint:recommended',
-    'plugin:svelte/recommended',
-    '@electron-toolkit/eslint-config-ts/recommended',
-    '@electron-toolkit/eslint-config-prettier'
+    'plugin:svelte/recommended'
   ],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    extraFileExtensions: ['.svelte']
+  },
   overrides: [
     {
       files: ['*.svelte'],

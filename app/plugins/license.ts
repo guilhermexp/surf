@@ -49,18 +49,18 @@ const readAllDependencies = (packageJsonPath: string) => {
 }
 
 export const createLicensePlugin = (process: string) => {
-  let additionalDependencies
-  if (process === 'main') {
-    additionalDependencies = readAllDependencies(join(__dirname, '..', 'package.json'))
-  }
+  // let additionalDependencies
+  // if (process === 'main') {
+  //   additionalDependencies = readAllDependencies(join(__dirname, '..', 'package.json'))
+  // }
   return licensePlugin({
     thirdParty: {
       multipleVersions: false,
       output: {
         file: createLicenseOutputPath(process)
       }
-    },
-    additionalDependencies
+    }
+    // additionalDependencies
   }) as Plugin
 }
 

@@ -19,7 +19,28 @@ export async function setupAdblocker() {
   //   write: fs.writeFile
   // })
   // TODO: caching might be the cause
-  blocker = await ElectronBlocker.fromPrebuiltAdsOnly(fetch)
+  try {
+    // Try different initialization methods
+    try {
+      // First try with prebuilt lists
+      blocker = await ElectronBlocker.fromPrebuiltAdsOnly(fetch)
+    } catch (prebuiltError) {
+      console.warn('[Adblocker] Failed to load prebuilt lists, trying alternative:', prebuiltError)
+
+      // Fallback to empty blocker or basic lists
+      try {
+        // Create empty blocker as fallback
+        blocker = ElectronBlocker.parse('')
+        console.info('[Adblocker] Initialized with empty ruleset as fallback')
+      } catch (fallbackError) {
+        console.error('[Adblocker] Complete initialization failure:', fallbackError)
+        blocker = null
+      }
+    }
+  } catch (error) {
+    console.error('[Adblocker] failed to initialize, disabling blocker:', error)
+    blocker = null
+  }
 }
 
 export function initAdblocker(partition: string) {

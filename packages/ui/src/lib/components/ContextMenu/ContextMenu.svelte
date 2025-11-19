@@ -151,7 +151,11 @@
 
       // Copy styles including color-scheme to overlay window
       if (overlay?.window) {
-        styleCleanup = copyStyles(overlay.window)
+        try {
+          styleCleanup = copyStyles(overlay.window)
+        } catch (e) {
+          console.warn('Failed to copy styles to overlay window', e)
+        }
       }
     }
 
@@ -379,3 +383,9 @@
 >
   <ContextMenuItems {items} />
 </dialog>
+
+<style>
+  dialog {
+    z-index: 999999;
+  }
+</style>

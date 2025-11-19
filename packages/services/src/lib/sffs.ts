@@ -1004,6 +1004,8 @@ export class SFFS {
     try {
       return await fn.apply(context, args)
     } catch (error) {
+      console.error('🔴 SFFS Error:', error)
+      this.log.error('SFFS Error:', error)
       this.log.debug('error', error)
       const message =
         typeof error === 'string' ? error : error instanceof Error ? error.message : undefined

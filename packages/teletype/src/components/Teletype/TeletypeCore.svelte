@@ -31,12 +31,14 @@
     tools,
     key,
     preferredActionIndex = null,
-    hideNavigation = false
+    hideNavigation = false,
+    header
   }: {
     tools: Snippet
     key?: string | undefined
     preferredActionIndex?: number | null
     hideNavigation?: boolean
+    header?: Snippet
   } = $props()
 
   const teletype = useTeletype(key)
@@ -498,7 +500,7 @@
   {/if}
   <div class="box" class:modal-content={isModal}>
     <div class="box-inner">
-      <slot name="header" />
+      {@render header?.()}
       {#if $open}
         {#if $currentAction?.titleText && !$loading}
           <div class="title">{$currentAction.titleText}</div>
@@ -507,20 +509,22 @@
         {#if isModal && ($currentAction?.component || $currentAction?.lazyComponent)}
           <div class="modal-component-wrapper" use:focus={$currentAction?.view === 'ModalLarge'}>
             {#if $currentAction?.component}
-              <svelte:component
-                this={$currentAction.component}
-                action={$currentAction}
-                {teletype}
-                teletypeInputValue={inputValue}
-                {...$currentAction.componentProps}
-              />
+              {#key $currentAction?.component}
+                {@const Component = ($currentAction as any).component}
+                <Component
+                  action={$currentAction}
+                  {teletype}
+                  teletypeInputValue={inputValue}
+                  {...($currentAction as any).componentProps}
+                />
+              {/key}
             {:else if $currentAction?.lazyComponent}
               <Lazy
                 component={$currentAction.lazyComponent}
                 action={$currentAction}
                 {teletype}
                 teletypeInputValue={inputValue}
-                {...$currentAction.componentProps}
+                {...($currentAction as any).componentProps}
               />
             {/if}
           </div>
@@ -528,9 +532,10 @@
           <!-- Move content rendering after footer/input -->
         {/if}
       {/if}
-      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-      <div class="footer" onclick={() => !isModal && openTeletype()} role="none">
-        <!-- svelte-ignore a11y-missing-attribute -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="footer" onclick={() => !isModal && openTeletype()}>
+        <!-- svelte-ignore a11y_missing_attribute -->
         <!--<div class="icon-wrapper">
           {#if $editMode}
             <Icon name="edit" size="20px" color="--(text)" />
@@ -551,6 +556,7 @@
           <div
             role="button"
             class="close"
+            tabindex="0"
             onclick={(e) => {
               e.stopPropagation()
               closeTeletype()
@@ -623,10 +629,9 @@
 
       <!-- Results section moved below input -->
       <div class="tools-and-send-wrapper">
-        <slot
-          name="tools"
-          disabled={!isInMentionMode && !hasMentions && $selectedAction?.id !== 'ask-action'}
-        ></slot>
+        {@render tools?.({
+          disabled: !isInMentionMode && !hasMentions && $selectedAction?.id !== 'ask-action'
+        })}
 
         <div class="send-button-wrapper" transition:fade={{ duration: 150 }}>
           {#if ttyActions.secondary}
@@ -681,8 +686,8 @@
           <ActionList
             actions={$filteredResult}
             bind:resetActiveIndex={resetActionList}
-            on:execute={handleActionClick}
-            on:selected={handleSelectedAction}
+            onexecute={handleActionClick}
+            onselected={handleSelectedAction}
             freeze={$showActionPanel}
             {preferredActionIndex}
           />
@@ -690,13 +695,15 @@
         {#if !$filteredResult || !Array.isArray($filteredResult) || $filteredResult.length <= 0}
           {#if $currentAction?.component}
             <div class="component-wrapper" use:focus={$currentAction?.view === 'ModalLarge'}>
-              <svelte:component
-                this={$currentAction.component}
-                action={$currentAction}
-                {teletype}
-                teletypeInputValue={inputValue}
-                {...$currentAction.componentProps}
-              />
+              {#key $currentAction?.component}
+                {@const Component = ($currentAction as any).component}
+                <Component
+                  action={$currentAction}
+                  {teletype}
+                  teletypeInputValue={inputValue}
+                  {...($currentAction as any).componentProps}
+                />
+              {/key}
             </div>
           {:else if $currentAction?.lazyComponent}
             <div class="component-wrapper" use:focus={$currentAction?.view === 'ModalLarge'}>
@@ -705,7 +712,7 @@
                 action={$currentAction}
                 {teletype}
                 teletypeInputValue={inputValue}
-                {...$currentAction.componentProps}
+                {...($currentAction as any).componentProps}
               />
             </div>
           {:else if $loading}

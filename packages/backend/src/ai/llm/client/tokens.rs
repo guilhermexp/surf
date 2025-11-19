@@ -219,6 +219,8 @@ mod tests {
             page: None,
             description: None,
             created_at: None,
+            resource_text_content_id: None,
+            timestamp: None,
         })
         .expect("Failed to create context message");
 

@@ -166,6 +166,10 @@ impl Worker {
             Ok(())
         });
     }
+
+    pub fn wait_for_backend(&self) {
+        self.surf_backend_health.wait_until_healthy();
+    }
 }
 
 pub fn worker_thread_entry_point(

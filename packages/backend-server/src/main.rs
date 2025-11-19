@@ -89,5 +89,8 @@ fn main() {
     .expect("failed to create new server");
 
     info!("healthy");
+    // Force flush stdout to ensure Electron can read the message immediately
+    use std::io::Write;
+    std::io::stdout().flush().ok();
     server.listen();
 }

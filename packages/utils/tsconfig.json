@@ -11,7 +11,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": false,
     "composite": true,
-    "verbatimModuleSyntax": true,
+
     "isolatedModules": true
   }
 }

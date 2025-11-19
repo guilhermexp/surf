@@ -81,10 +81,10 @@ fn js_set_surf_backend_health(mut cx: FunctionContext) -> JsResult<JsPromise> {
     let surf_backend_state = cx.argument::<JsBoolean>(1)?.value(&mut cx);
 
     let (deferred, promise) = cx.promise();
-    tunnel.worker_send_js(
-        WorkerMessage::MiscMessage(MiscMessage::SetSurfBackendHealth(surf_backend_state)),
-        deferred,
-    );
+    tunnel.surf_backend_health.set_health(surf_backend_state);
+    tracing::debug!("surf backend health set via JS: {surf_backend_state:?}");
+    let undefined = cx.undefined();
+    deferred.resolve(&mut cx, undefined);
     Ok(promise)
 }
 

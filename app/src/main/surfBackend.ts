@@ -82,6 +82,9 @@ export class SurfBackendServerManager extends EventEmitter {
   }
 
   private spawnProcess(): void {
+    console.log('[SURF-BACKEND] Spawning process:', this.serverPath)
+    console.log('[SURF-BACKEND] Args:', this.args)
+    console.log('[SURF-BACKEND] Options:', this.options)
     this.process = spawn(this.serverPath, this.args, {
       ...this.options
     })
@@ -90,7 +93,9 @@ export class SurfBackendServerManager extends EventEmitter {
       const lines = data.toString().trimEnd().split('\n')
 
       lines.forEach((line) => {
+        console.log('[SURF-BACKEND-STDOUT]', line)
         if (line.includes('healthy')) {
+          console.log('[SURF-BACKEND] ✅ Server is HEALTHY!')
           this.restartAttempts = 0
           this.lastKnownHealth = true
           this.emit('ready')
@@ -109,7 +114,10 @@ export class SurfBackendServerManager extends EventEmitter {
         .toString()
         .trimEnd()
         .split('\n')
-        .forEach((line) => this.emit('stderr', line))
+        .forEach((line) => {
+          console.error('[SURF-BACKEND-STDERR]', line)
+          this.emit('stderr', line)
+        })
     })
 
     this.process.on('exit', (exit, signal) => {

@@ -18,6 +18,8 @@
     active?: boolean
     isOption?: boolean
     horizontalItems?: Action[]
+    onexecute?: (action: Action) => void
+    onselected?: (action: Action) => void
   } = $props()
   let selectedItemIndex = 0
   let keydownHandler: ((e: KeyboardEvent) => void) | null = null
@@ -96,13 +98,6 @@
     }
   })
 
-  type Events = {
-    execute: Action
-    selected: Action
-  }
-
-  const dispatch = createEventDispatcher<Events>()
-
   const executeAction = async (action: Action, e: MouseEvent | KeyboardEvent) => {
     let options: ActionPanelOption[] = []
 
@@ -116,17 +111,17 @@
 
     const secondaryAction = options.find((a) => a.shortcutType === 'secondary')
     if (e.shiftKey && secondaryAction) {
-      dispatch('execute', secondaryAction as Action)
+      onexecute?.(secondaryAction as Action)
       return
     }
 
     const tertiaryAction = options.find((a) => a.shortcutType === 'tertiary')
     if ((e.ctrlKey || e.metaKey) && tertiaryAction) {
-      dispatch('execute', tertiaryAction as Action)
+      onexecute?.(tertiaryAction as Action)
       return
     }
 
-    dispatch('execute', action)
+    onexecute?.(action)
   }
 
   function handleKeydown(e: KeyboardEvent) {
@@ -151,7 +146,7 @@
         }
         const selectedItem = horizontalItems[selectedItemIndex]
         if (selectedItem) {
-          dispatch('selected', selectedItem)
+          onselected?.(selectedItem)
         }
         keepSelectedItemVisible()
         break
@@ -167,7 +162,7 @@
         }
         const selectedItem = horizontalItems[selectedItemIndex]
         if (selectedItem) {
-          dispatch('selected', selectedItem)
+          onselected?.(selectedItem)
         }
         keepSelectedItemVisible()
         break
@@ -221,7 +216,7 @@
       selectedItemIndex = index
       const hoveredItem = horizontalItems[index]
       if (hoveredItem) {
-        dispatch('selected', hoveredItem)
+        onselected?.(hoveredItem)
       }
     }
   }
@@ -238,11 +233,11 @@
   }
 
   const isItemInlineReplace = (item: Action) => {
-    return item.view === 'InlineReplace' && item.component
+    return item.view === 'InlineReplace' && 'component' in item
   }
 
   const isItemInline = (item: Action) => {
-    return item.view === 'Inline' && item.component
+    return item.view === 'Inline' && 'component' in item
   }
 
   onMount(() => {
@@ -288,7 +283,7 @@
   class:active
   class:option={isOption}
   class:horizontal={horizontalItems.length > 0}
-  on:click|stopPropagation={handleClick}
+  onclick={handleClick}
 >
   {#if horizontalItems.length > 0}
     <div
@@ -299,12 +294,12 @@
       <div bind:this={listElement} class="horizontal-list">
         {#each horizontalItems as item, index}
           {#if isItemInline(item)}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              role="none"
               class="horizontal-item component permanent"
               class:selected={active && index === selectedItemIndex}
-              on:mouseenter={() => handleHover(index)}
-              on:click|stopPropagation={(e) => {
+              onmouseenter={() => handleHover(index)}
+              onclick={(e) => {
                 e.preventDefault()
                 handleClick(e, item)
               }}
@@ -312,18 +307,17 @@
                 duration: 200
               }}
             >
-              <svelte:component
-                this={item.component}
-                action={item}
-                {...item.componentProps || {}}
-              />
+              {#key item.id}
+                {@const Component = (item as any).component}
+                <Component action={item} {...(item as any).componentProps || {}} />
+              {/key}
             </div>
           {:else if isItemInlineReplace(item) && active && index === selectedItemIndex}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              role="none"
               class="horizontal-item component replace"
-              on:mouseenter={() => handleHover(index)}
-              on:click|stopPropagation={(e) => {
+              onmouseenter={() => handleHover(index)}
+              onclick={(e) => {
                 e.preventDefault()
                 handleClick(e, item)
               }}
@@ -331,22 +325,21 @@
                 duration: 200
               }}
             >
-              <svelte:component
-                this={item.component}
-                action={item}
-                {...item.componentProps || {}}
-              />
+              {#key item.id}
+                {@const Component = (item as any).component}
+                <Component action={item} {...(item as any).componentProps || {}} />
+              {/key}
             </div>
           {:else}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               class="horizontal-item"
               class:selected={active && index === selectedItemIndex}
-              on:mouseenter={() => handleHover(index)}
-              on:click|stopPropagation={(e) => {
+              onmouseenter={() => handleHover(index)}
+              onclick={(e) => {
                 e.preventDefault()
                 handleClick(e, item)
               }}
-              role="none"
             >
               {#if item.icon}
                 <div class="item-icon">

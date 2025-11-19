@@ -118,13 +118,13 @@
       on:search-web={handleSearchWeb}
       {hideNavigation}
     >
-      <svelte:fragment slot="tools">
+      {#snippet tools()}
         <div class="controls-list">
           <AddToContextMenu {onFileSelect} {onMentionSelect} />
           <ToolsList teletype={teletypeService} />
           <ModelPicker />
         </div>
-      </svelte:fragment>
+      {/snippet}
     </Teletype>
   </TeletypeProvider>
 

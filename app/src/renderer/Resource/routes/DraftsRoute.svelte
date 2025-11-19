@@ -304,6 +304,7 @@
     padding-left: calc(50vw - 50%);
     padding-right: calc(50vw - 50%);
     margin-top: 1rem;
+    flex: 1; /* Ocupa todo espaço restante */
     opacity: 0.5;
     transition: opacity 223ms ease-out;
 

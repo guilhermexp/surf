@@ -42,16 +42,14 @@ const bootstrap = async () => {
       initialLocale
     })
   } catch (error) {
-    console.error('[settings] Failed to initialize localization, continuing with defaults', error)
+    console.error('[settings] Failed to initialize localization', error)
   }
 
-  app = mount(Settings, {
+  mount(Settings, {
     target: document.getElementById('app')
   })
 }
 
-bootstrap().catch((error) => {
-  console.error('[settings] Failed to bootstrap renderer', error)
-})
+bootstrap()
 
 export default app

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button, Tooltip } from 'bits-ui'
   import type { Snippet } from 'svelte'
+  import type { HTMLButtonAttributes } from 'svelte/elements'
 
   type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'fill'
 
@@ -22,7 +23,7 @@
     tooltip?: string
     tooltipSide?: 'top' | 'bottom' | 'left' | 'right'
     class?: string
-  } = $props()
+  } & HTMLButtonAttributes = $props()
 
   const sizeClass = `button-${size}`
   const shapeClass = square ? 'button-square' : ''
